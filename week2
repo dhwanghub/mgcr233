@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python, from the ground up</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper: #F7F3E9;
+    --paper-2: #FBF8F1;
+    --ink: #22262B;
+    --ink-soft: #565C63;
+    --rule: #C7D3DE;
+    --margin-red: #B4444F;
+    --pine: #2E6B4F;
+    --pine-soft: #E4EEE7;
+    --wrong: #B4444F;
+    --wrong-soft: #F5E4E3;
+    --tab-1: #E4D9C3;
+    --tab-2: #D9E1D3;
+    --tab-3: #DCD3E3;
+    --tab-4: #E3D3D6;
+    --tab-5: #D3DEE3;
+    --tab-6: #E9E1CE;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    line-height:1.5;
+  }
+  code, .mono{
+    font-family:'IBM Plex Mono', monospace;
+  }
+  h1,h2,h3{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    margin:0;
+    letter-spacing:-0.01em;
+  }
+  a{color:inherit;}
+  .wrap{
+    max-width:760px;
+    margin:0 auto;
+    padding:0 28px;
+  }
+
+  /* ===== Notebook margin rule, runs the whole page ===== */
+  .page{
+    position:relative;
+    border-left:3px solid var(--margin-red);
+    margin-left:48px;
+  }
+  .page::before{
+    content:"";
+    position:absolute;
+    top:0; bottom:0;
+    left:-1px;
+    width:1px;
+  }
+  @media (max-width:640px){
+    .page{margin-left:20px;}
+  }
+
+  /* ===== Hero ===== */
+  .hero{
+    padding:88px 0 64px;
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent 37px,
+      var(--rule) 38px
+    );
+    background-position: 0 96px;
+  }
+  .kicker{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:14px;
+    color:var(--ink-soft);
+    margin-bottom:18px;
+  }
+  .kicker .dot{color:var(--pine);}
+  .hero h1{
+    font-size:56px;
+    line-height:1.08;
+    max-width:11ch;
+  }
+  .hero h1 em{
+    font-style:italic;
+    font-weight:500;
+    color:var(--pine);
+  }
+  .hero p.lede{
+    margin-top:22px;
+    font-size:19px;
+    color:var(--ink-soft);
+    max-width:46ch;
+  }
+  .hero-actions{
+    margin-top:34px;
+    display:flex;
+    gap:14px;
+    flex-wrap:wrap;
+  }
+  .btn{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:14px;
+    padding:13px 22px;
+    border-radius:3px;
+    border:1.5px solid var(--ink);
+    background:var(--ink);
+    color:var(--paper-2);
+    cursor:pointer;
+    text-decoration:none;
+    display:inline-block;
+    transition:transform .12s ease;
+  }
+  .btn:hover{ transform:translateY(-1px); }
+  .btn.ghost{
+    background:transparent;
+    color:var(--ink);
+  }
+
+  /* ===== Modules: binder tabs ===== */
+  .modules{ padding:20px 0 72px; }
+  .section-head{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:16px;
+    margin-bottom:28px;
+  }
+  .section-head h2{ font-size:28px; }
+  .section-head .count{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    color:var(--ink-soft);
+    white-space:nowrap;
+  }
+  .tabs{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:12px;
+  }
+  @media (max-width:640px){
+    .tabs{ grid-template-columns:1fr 1fr; }
+  }
+  .tab{
+    border-radius:3px;
+    padding:18px 16px 16px;
+    min-height:112px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    position:relative;
+  }
+  .tab .num{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:var(--ink-soft);
+  }
+  .tab .name{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:17px;
+    margin-top:14px;
+  }
+  .tab:nth-child(1){background:var(--tab-1);}
+  .tab:nth-child(2){background:var(--tab-2);}
+  .tab:nth-child(3){background:var(--tab-3);}
+  .tab:nth-child(4){background:var(--tab-4);}
+  .tab:nth-child(5){background:var(--tab-5);}
+  .tab:nth-child(6){background:var(--tab-6);}
+
+  /* ===== Worksheet / quiz ===== */
+  .worksheet{
+    padding:16px 0 100px;
+  }
+  .sheet-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    border-bottom:2px solid var(--ink);
+    padding-bottom:14px;
+    margin-bottom:34px;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .sheet-header h2{ font-size:28px; }
+  .sheet-header .meta{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    color:var(--ink-soft);
+  }
+
+  .question{
+    padding:26px 0;
+    border-bottom:1px solid var(--rule);
+  }
+  .question:first-of-type{ padding-top:0; }
+
+  .q-row{
+    display:flex;
+    gap:14px;
+  }
+  .q-index{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:20px;
+    color:var(--ink-soft);
+    min-width:28px;
+  }
+  .q-body{ flex:1; }
+  .q-prompt{
+    font-size:17px;
+    margin-bottom:6px;
+  }
+  .q-prompt code{
+    background:var(--paper-2);
+    border:1px solid var(--rule);
+    padding:1px 6px;
+    border-radius:3px;
+    font-size:15px;
+  }
+  .q-topic{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px;
+    color:var(--ink-soft);
+    margin-bottom:16px;
+  }
+
+  .options{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .option{
+    display:flex;
+    align-items:flex-start;
+    gap:11px;
+    padding:9px 12px;
+    border:1.5px solid var(--rule);
+    border-radius:3px;
+    cursor:pointer;
+    background:var(--paper-2);
+    transition:border-color .12s ease, background .12s ease;
+  }
+  .option:hover{ border-color:var(--ink-soft); }
+  .option input{
+    margin-top:3px;
+    accent-color:var(--ink);
+  }
+  .option .label{
+    font-size:15.5px;
+  }
+  .option.is-selected{
+    border-color:var(--ink);
+  }
+  .option.is-correct{
+    border-color:var(--pine);
+    background:var(--pine-soft);
+  }
+  .option.is-wrong{
+    border-color:var(--wrong);
+    background:var(--wrong-soft);
+  }
+
+  .q-feedback{
+    margin-top:12px;
+    font-size:14.5px;
+    color:var(--ink-soft);
+    display:none;
+  }
+  .q-feedback.show{ display:block; }
+  .q-feedback .verdict{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+    padding:2px 7px;
+    border-radius:3px;
+    margin-right:8px;
+  }
+  .q-feedback .verdict.right{ background:var(--pine-soft); color:var(--pine); }
+  .q-feedback .verdict.wrong{ background:var(--wrong-soft); color:var(--wrong); }
+
+  .grade-bar{
+    margin-top:40px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:20px;
+    flex-wrap:wrap;
+  }
+  .grade-bar .hint{
+    font-size:14px;
+    color:var(--ink-soft);
+  }
+
+  .stamp{
+    display:none;
+    align-items:center;
+    gap:16px;
+    margin-top:36px;
+    padding:20px 22px;
+    border:2px solid var(--pine);
+    border-radius:4px;
+    background:var(--pine-soft);
+  }
+  .stamp.show{ display:flex; }
+  .stamp .score{
+    font-family:'Fraunces', serif;
+    font-weight:700;
+    font-size:32px;
+    color:var(--pine);
+    transform:rotate(-3deg);
+  }
+  .stamp .msg{
+    font-size:14.5px;
+    color:var(--ink);
+  }
+
+  footer{
+    padding:40px 0 60px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+    color:var(--ink-soft);
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+  <div class="wrap">
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="kicker">python&nbsp;basics <span class="dot">&middot;</span> a course for people who've never written a line of code</div>
+      <h1>Learn to think<br>in <em>Python</em>,<br>one line at a time.</h1>
+      <p class="lede">Six short modules, plain-language explanations, and a graded worksheet at the end of each one — so you know exactly what's sticking and what needs another look.</p>
+      <div class="hero-actions">
+        <a href="#modules" class="btn">See the modules</a>
+        <a href="#practice" class="btn ghost">Jump to practice</a>
+      </div>
+    </section>
+
+    <!-- MODULES -->
+    <section class="modules" id="modules">
+      <div class="section-head">
+        <h2>The course, in six parts</h2>
+        <div class="count">6 modules</div>
+      </div>
+      <div class="tabs">
+        <div class="tab"><span class="num">01</span><span class="name">Variables &amp; types</span></div>
+        <div class="tab"><span class="num">02</span><span class="name">Strings</span></div>
+        <div class="tab"><span class="num">03</span><span class="name">Conditionals</span></div>
+        <div class="tab"><span class="num">04</span><span class="name">Loops</span></div>
+        <div class="tab"><span class="num">05</span><span class="name">Functions</span></div>
+        <div class="tab"><span class="num">06</span><span class="name">Lists &amp; dicts</span></div>
+      </div>
+    </section>
+
+    <!-- WORKSHEET / QUIZ -->
+    <section class="worksheet" id="practice">
+      <div class="sheet-header">
+        <h2>Practice worksheet</h2>
+        <div class="meta" id="progress-meta">0 of 10 answered</div>
+      </div>
+
+      <div id="quiz-root"></div>
+
+      <div class="grade-bar">
+        <div class="hint">Answer what you can, then grade the sheet — wrong answers show the fix.</div>
+        <button class="btn" id="grade-btn">Grade my worksheet</button>
+      </div>
+
+      <div class="stamp" id="stamp">
+        <div class="score" id="stamp-score">0/10</div>
+        <div class="msg" id="stamp-msg"></div>
+      </div>
+    </section>
+
+    <footer>
+      made for a python basics course &middot; edit the QUESTIONS array to add more of your own
+    </footer>
+
+  </div>
+</div>
+
+<script>
+const QUESTIONS = [
+  {
+    topic: "variables & types",
+    prompt: "What is the type of <code>x = 7 / 2</code> in Python 3?",
+    options: ["int", "float", "str", "double"],
+    correct: 1,
+    explain: "The / operator always returns a float, even when both numbers are whole — 7 / 2 gives 3.5."
+  },
+  {
+    topic: "variables & types",
+    prompt: "Which line correctly creates a variable holding the text <code>hello</code>?",
+    options: ["var greeting = hello", "greeting = \"hello\"", "greeting == \"hello\"", "string greeting = hello"],
+    correct: 1,
+    explain: "Python needs no type keyword — a single = assigns, and quotes mark a string."
+  },
+  {
+    topic: "strings",
+    prompt: "What does <code>\"Py\" + \"thon\"</code> evaluate to?",
+    options: ["PyThon", "Py thon", "Python", "an error"],
+    correct: 2,
+    explain: "+ on two strings concatenates them directly with no added space: \"Python\"."
+  },
+  {
+    topic: "strings",
+    prompt: "What does <code>\"coding\"[1:4]</code> return?",
+    options: ["cod", "odi", "codi", "oding"],
+    correct: 1,
+    explain: "Slicing [1:4] takes indices 1, 2, 3 — the letters o, d, i."
+  },
+  {
+    topic: "conditionals",
+    prompt: "Which keyword checks an additional condition after an <code>if</code> has failed?",
+    options: ["elseif", "elif", "else if", "or if"],
+    correct: 1,
+    explain: "Python's keyword is elif — a contraction of else and if, on one word."
+  },
+  {
+    topic: "conditionals",
+    prompt: "What does this print?  <code>x = 4\\nif x > 5:\\n  print(\"big\")\\nelse:\\n  print(\"small\")</code>",
+    options: ["big", "small", "nothing", "an error"],
+    correct: 1,
+    explain: "4 is not greater than 5, so the condition is False and the else branch runs, printing small."
+  },
+  {
+    topic: "loops",
+    prompt: "How many times does <code>for i in range(3):</code> run its body?",
+    options: ["2", "3", "4", "It depends on i"],
+    correct: 1,
+    explain: "range(3) produces 0, 1, 2 — three values, so the loop body runs three times."
+  },
+  {
+    topic: "loops",
+    prompt: "Which loop keeps running as long as a condition stays true, rather than a fixed number of times?",
+    options: ["for", "while", "range", "repeat"],
+    correct: 1,
+    explain: "A while loop re-checks its condition each pass and stops the moment it's False."
+  },
+  {
+    topic: "functions",
+    prompt: "What keyword starts a function definition in Python?",
+    options: ["func", "function", "def", "define"],
+    correct: 2,
+    explain: "Functions are declared with def, followed by a name and parentheses."
+  },
+  {
+    topic: "lists & dicts",
+    prompt: "What does <code>len({\"a\": 1, \"b\": 2})</code> return?",
+    options: ["1", "2", "4", "an error"],
+    correct: 1,
+    explain: "len() on a dictionary counts its key–value pairs — there are two: a and b."
+  }
+];
+
+const root = document.getElementById('quiz-root');
+const answers = new Array(QUESTIONS.length).fill(null);
+
+function render(){
+  root.innerHTML = '';
+  QUESTIONS.forEach((q, qi) => {
+    const qDiv = document.createElement('div');
+    qDiv.className = 'question';
+
+    const row = document.createElement('div');
+    row.className = 'q-row';
+
+    const idx = document.createElement('div');
+    idx.className = 'q-index';
+    idx.textContent = String(qi + 1).padStart(2, '0');
+
+    const body = document.createElement('div');
+    body.className = 'q-body';
+
+    const prompt = document.createElement('div');
+    prompt.className = 'q-prompt';
+    prompt.innerHTML = q.prompt;
+
+    const topic = document.createElement('div');
+    topic.className = 'q-topic';
+    topic.textContent = q.topic;
+
+    const opts = document.createElement('div');
+    opts.className = 'options';
+
+    q.options.forEach((optText, oi) => {
+      const label = document.createElement('label');
+      label.className = 'option';
+      label.dataset.qi = qi;
+      label.dataset.oi = oi;
+
+      const input = document.createElement('input');
+      input.type = 'radio';
+      input.name = 'q' + qi;
+      input.value = oi;
+      input.addEventListener('change', () => {
+        answers[qi] = oi;
+        updateProgress();
+        clearFeedback(qi);
+      });
+
+      const span = document.createElement('span');
+      span.className = 'label';
+      span.textContent = optText;
+
+      label.appendChild(input);
+      label.appendChild(span);
+      opts.appendChild(label);
+    });
+
+    const feedback = document.createElement('div');
+    feedback.className = 'q-feedback';
+    feedback.id = 'feedback-' + qi;
+
+    body.appendChild(prompt);
+    body.appendChild(topic);
+    body.appendChild(opts);
+    body.appendChild(feedback);
+
+    row.appendChild(idx);
+    row.appendChild(body);
+    qDiv.appendChild(row);
+    root.appendChild(qDiv);
+  });
+}
+
+function clearFeedback(qi){
+  const fb = document.getElementById('feedback-' + qi);
+  fb.classList.remove('show');
+  fb.innerHTML = '';
+  document.querySelectorAll(`.option[data-qi="${qi}"]`).forEach(o => {
+    o.classList.remove('is-correct', 'is-wrong');
+  });
+}
+
+function updateProgress(){
+  const answered = answers.filter(a => a !== null).length;
+  document.getElementById('progress-meta').textContent = `${answered} of ${QUESTIONS.length} answered`;
+}
+
+document.getElementById('grade-btn').addEventListener('click', () => {
+  let score = 0;
+  QUESTIONS.forEach((q, qi) => {
+    const fb = document.getElementById('feedback-' + qi);
+    const chosen = answers[qi];
+    const isRight = chosen === q.correct;
+    if (isRight) score++;
+
+    document.querySelectorAll(`.option[data-qi="${qi}"]`).forEach(optEl => {
+      const oi = Number(optEl.dataset.oi);
+      if (oi === q.correct) optEl.classList.add('is-correct');
+      else if (oi === chosen) optEl.classList.add('is-wrong');
+    });
+
+    fb.innerHTML = chosen === null
+      ? `<span class="verdict wrong">skipped</span>${q.explain}`
+      : isRight
+        ? `<span class="verdict right">correct</span>${q.explain}`
+        : `<span class="verdict wrong">not quite</span>${q.explain}`;
+    fb.classList.add('show');
+  });
+
+  const stamp = document.getElementById('stamp');
+  const stampScore = document.getElementById('stamp-score');
+  const stampMsg = document.getElementById('stamp-msg');
+  stampScore.textContent = `${score}/${QUESTIONS.length}`;
+  stampMsg.textContent = score === QUESTIONS.length
+    ? "Clean sheet — every question landed."
+    : `Review the marked-up questions above, then try the sheet again.`;
+  stamp.classList.add('show');
+  stamp.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+});
+
+render();
+</script>
+
+</body>
+</html>
