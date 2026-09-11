@@ -3,290 +3,244 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Python, from the ground up</title>
+<title>MGCR 233 — Practice</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --paper: #F7F3E9;
-    --paper-2: #FBF8F1;
-    --ink: #22262B;
-    --ink-soft: #565C63;
-    --rule: #C7D3DE;
-    --margin-red: #B4444F;
-    --pine: #2E6B4F;
-    --pine-soft: #E4EEE7;
-    --wrong: #B4444F;
-    --wrong-soft: #F5E4E3;
-    --tab-1: #E4D9C3;
-    --tab-2: #D9E1D3;
-    --tab-3: #DCD3E3;
-    --tab-4: #E3D3D6;
-    --tab-5: #D3DEE3;
-    --tab-6: #E9E1CE;
+    --red:#E01F2E;
+    --red-dark:#B0121F;
+    --black:#1A1A1A;
+    --gray:#5B5B5B;
+    --gray-light:#8C8C8C;
+    --line:#E4E4E4;
+    --paper:#FFFFFF;
+    --off:#F7F7F7;
+    --correct-bg:#EAF7EE;
+    --correct-line:#2E8B4F;
+    --wrong-bg:#FDECEC;
+    --wrong-line:var(--red);
   }
-
   *{box-sizing:border-box;}
   html{scroll-behavior:smooth;}
   body{
     margin:0;
     background:var(--paper);
-    color:var(--ink);
-    font-family:'IBM Plex Sans', sans-serif;
-    line-height:1.5;
+    color:var(--black);
+    font-family:'Inter', sans-serif;
+    line-height:1.55;
   }
-  code, .mono{
-    font-family:'IBM Plex Mono', monospace;
-  }
-  h1,h2,h3{
-    font-family:'Fraunces', serif;
-    font-weight:600;
-    margin:0;
-    letter-spacing:-0.01em;
-  }
+  h1,h2,h3{ margin:0; font-weight:700; }
   a{color:inherit;}
-  .wrap{
-    max-width:760px;
-    margin:0 auto;
-    padding:0 28px;
-  }
+  button{ font-family:inherit; }
+  .wrap{ max-width:760px; margin:0 auto; padding:0 28px; }
 
-  /* ===== Notebook margin rule, runs the whole page ===== */
-  .page{
-    position:relative;
-    border-left:3px solid var(--margin-red);
-    margin-left:48px;
-  }
-  .page::before{
-    content:"";
-    position:absolute;
-    top:0; bottom:0;
-    left:-1px;
-    width:1px;
-  }
-  @media (max-width:640px){
-    .page{margin-left:20px;}
-  }
-
-  /* ===== Hero ===== */
+  /* ===== Hero (title-slide style) ===== */
   .hero{
-    padding:88px 0 64px;
-    background-image: repeating-linear-gradient(
-      to bottom,
-      transparent 0px,
-      transparent 37px,
-      var(--rule) 38px
-    );
-    background-position: 0 96px;
+    background:var(--red);
+    color:#fff;
+    padding:64px 28px 56px;
   }
-  .kicker{
-    font-family:'IBM Plex Mono', monospace;
+  .hero-inner{ max-width:760px; margin:0 auto; }
+  .hero .course-code{
     font-size:14px;
-    color:var(--ink-soft);
+    font-weight:600;
+    letter-spacing:0.02em;
+    opacity:0.9;
+    margin-bottom:10px;
+  }
+  .hero h1{
+    font-size:34px;
+    line-height:1.25;
+  }
+
+  /* ===== Course info ===== */
+  .info{ padding:40px 0 12px; }
+  .info h2{
+    font-size:18px;
     margin-bottom:18px;
   }
-  .kicker .dot{color:var(--pine);}
-  .hero h1{
-    font-size:56px;
-    line-height:1.08;
-    max-width:11ch;
-  }
-  .hero h1 em{
-    font-style:italic;
-    font-weight:500;
-    color:var(--pine);
-  }
-  .hero p.lede{
-    margin-top:22px;
-    font-size:19px;
-    color:var(--ink-soft);
-    max-width:46ch;
-  }
-  .hero-actions{
-    margin-top:34px;
-    display:flex;
-    gap:14px;
-    flex-wrap:wrap;
-  }
-  .btn{
-    font-family:'IBM Plex Mono', monospace;
-    font-size:14px;
-    padding:13px 22px;
-    border-radius:3px;
-    border:1.5px solid var(--ink);
-    background:var(--ink);
-    color:var(--paper-2);
-    cursor:pointer;
-    text-decoration:none;
-    display:inline-block;
-    transition:transform .12s ease;
-  }
-  .btn:hover{ transform:translateY(-1px); }
-  .btn.ghost{
-    background:transparent;
-    color:var(--ink);
-  }
-
-  /* ===== Modules: binder tabs ===== */
-  .modules{ padding:20px 0 72px; }
-  .section-head{
-    display:flex;
-    align-items:baseline;
-    justify-content:space-between;
-    gap:16px;
-    margin-bottom:28px;
-  }
-  .section-head h2{ font-size:28px; }
-  .section-head .count{
-    font-family:'IBM Plex Mono', monospace;
-    font-size:13px;
-    color:var(--ink-soft);
-    white-space:nowrap;
-  }
-  .tabs{
+  .info-grid{
     display:grid;
-    grid-template-columns:repeat(3, 1fr);
-    gap:12px;
+    grid-template-columns:1fr 1fr;
+    gap:16px 28px;
+    border-top:1px solid var(--line);
+    padding-top:18px;
   }
-  @media (max-width:640px){
-    .tabs{ grid-template-columns:1fr 1fr; }
+  @media (max-width:520px){
+    .info-grid{ grid-template-columns:1fr; }
   }
-  .tab{
-    border-radius:3px;
-    padding:18px 16px 16px;
-    min-height:112px;
-    display:flex;
-    flex-direction:column;
-    justify-content:space-between;
-    position:relative;
-  }
-  .tab .num{
-    font-family:'IBM Plex Mono', monospace;
+  .info-item .k{
     font-size:12px;
-    color:var(--ink-soft);
+    color:var(--gray-light);
+    margin-bottom:4px;
   }
-  .tab .name{
-    font-family:'Fraunces', serif;
-    font-weight:600;
-    font-size:17px;
-    margin-top:14px;
+  .info-item .v{
+    font-size:15px;
+    font-weight:500;
+    color:var(--black);
   }
-  .tab:nth-child(1){background:var(--tab-1);}
-  .tab:nth-child(2){background:var(--tab-2);}
-  .tab:nth-child(3){background:var(--tab-3);}
-  .tab:nth-child(4){background:var(--tab-4);}
-  .tab:nth-child(5){background:var(--tab-5);}
-  .tab:nth-child(6){background:var(--tab-6);}
+  .info-item .v a{ color:var(--red); text-decoration:none; }
+  .info-item .v a:hover{ text-decoration:underline; }
 
-  /* ===== Worksheet / quiz ===== */
-  .worksheet{
-    padding:16px 0 100px;
-  }
-  .sheet-header{
+  /* ===== Modules list ===== */
+  .modules{ padding:40px 0 88px; }
+  .modules-head{
     display:flex;
     justify-content:space-between;
-    align-items:flex-end;
-    border-bottom:2px solid var(--ink);
+    align-items:baseline;
+    border-bottom:1px solid var(--line);
     padding-bottom:14px;
-    margin-bottom:34px;
-    flex-wrap:wrap;
-    gap:10px;
+    margin-bottom:4px;
   }
-  .sheet-header h2{ font-size:28px; }
-  .sheet-header .meta{
-    font-family:'IBM Plex Mono', monospace;
+  .modules-head h2{ font-size:18px; }
+  .modules-head .note{ font-size:12.5px; color:var(--gray-light); }
+  .module-row{
+    display:flex;
+    align-items:center;
+    gap:20px;
+    padding:24px 4px;
+    border-bottom:1px solid var(--line);
+    cursor:pointer;
+    background:transparent;
+    transition:background .15s ease;
+  }
+  .module-row:hover{ background:var(--off); }
+  .module-row .m-num{
+    font-size:22px;
+    font-weight:800;
+    color:var(--red);
+    min-width:32px;
+  }
+  .module-row .m-body{ flex:1; }
+  .module-row .m-title{ font-size:17px; font-weight:700; }
+  .module-row .m-sub{ font-size:13.5px; color:var(--gray); margin-top:3px; }
+  .module-row .m-count{ font-size:12.5px; color:var(--gray-light); white-space:nowrap; }
+
+  /* ===== Quiz view ===== */
+  .quiz-view{ display:none; padding:44px 0 100px; }
+  .quiz-view.show{ display:block; }
+  .modules-root.hide{ display:none; }
+
+  .back-link{
+    display:inline-block;
+    font-size:13.5px;
+    color:var(--gray);
+    margin-bottom:28px;
+    cursor:pointer;
+    border:none;
+    background:none;
+    padding:0;
+    font-weight:600;
+  }
+  .back-link:hover{ color:var(--red); }
+
+  .quiz-header{
+    border-bottom:2px solid var(--black);
+    padding-bottom:16px;
+    margin-bottom:8px;
+  }
+  .quiz-header h2{ font-size:24px; }
+
+  /* ---- key point cards ---- */
+  .keypoints{ padding:26px 0 8px; }
+  .keypoints .kp-label{
     font-size:13px;
-    color:var(--ink-soft);
+    font-weight:700;
+    color:var(--red);
+    margin-bottom:12px;
   }
-
-  .question{
-    padding:26px 0;
-    border-bottom:1px solid var(--rule);
-  }
-  .question:first-of-type{ padding-top:0; }
-
-  .q-row{
+  .kp-track{
     display:flex;
     gap:14px;
+    overflow-x:auto;
+    padding-bottom:10px;
+    scroll-snap-type:x mandatory;
   }
-  .q-index{
-    font-family:'Fraunces', serif;
-    font-weight:600;
-    font-size:20px;
-    color:var(--ink-soft);
-    min-width:28px;
-  }
-  .q-body{ flex:1; }
-  .q-prompt{
-    font-size:17px;
-    margin-bottom:6px;
-  }
-  .q-prompt code{
-    background:var(--paper-2);
-    border:1px solid var(--rule);
-    padding:1px 6px;
-    border-radius:3px;
-    font-size:15px;
-  }
-  .q-topic{
-    font-family:'IBM Plex Mono', monospace;
-    font-size:11.5px;
-    color:var(--ink-soft);
-    margin-bottom:16px;
-  }
-
-  .options{
+  .kp-track::-webkit-scrollbar{ height:6px; }
+  .kp-track::-webkit-scrollbar-thumb{ background:var(--line); border-radius:3px; }
+  .kp-card{
+    flex:0 0 220px;
+    scroll-snap-align:start;
+    background:var(--black);
+    color:#fff;
+    border-radius:4px;
+    padding:20px 18px;
+    min-height:190px;
     display:flex;
     flex-direction:column;
-    gap:8px;
+    justify-content:space-between;
   }
+  .kp-card .kp-num{
+    font-size:12px;
+    color:var(--red);
+    font-weight:700;
+    margin-bottom:14px;
+  }
+  .kp-card .kp-title{
+    font-size:16px;
+    font-weight:700;
+    margin-bottom:8px;
+  }
+  .kp-card .kp-text{
+    font-size:13px;
+    color:#D9D9D9;
+    line-height:1.5;
+  }
+
+  .quiz-progress{
+    margin:24px 0 0;
+    font-size:13px;
+    color:var(--gray-light);
+    border-top:1px solid var(--line);
+    padding-top:18px;
+  }
+
+  .question{ padding:28px 0; border-bottom:1px solid var(--line); }
+  .q-row{ display:flex; gap:16px; }
+  .q-index{ font-size:18px; font-weight:800; color:var(--red); min-width:28px; }
+  .q-body{ flex:1; }
+  .q-prompt{ font-size:16px; margin-bottom:5px; color:var(--black); }
+  .q-prompt code, .q-prompt pre{
+    font-family:'Courier New', monospace;
+    background:var(--off);
+    border:1px solid var(--line);
+    padding:1px 6px;
+    border-radius:2px;
+    font-size:14px;
+    white-space:pre-wrap;
+  }
+  .q-topic{ font-size:11.5px; color:var(--gray-light); margin-bottom:14px; }
+
+  .options{ display:flex; flex-direction:column; gap:9px; }
   .option{
     display:flex;
     align-items:flex-start;
     gap:11px;
-    padding:9px 12px;
-    border:1.5px solid var(--rule);
+    padding:11px 14px;
+    border:1px solid var(--line);
     border-radius:3px;
     cursor:pointer;
-    background:var(--paper-2);
-    transition:border-color .12s ease, background .12s ease;
+    background:var(--off);
+    transition:border-color .12s ease;
   }
-  .option:hover{ border-color:var(--ink-soft); }
-  .option input{
-    margin-top:3px;
-    accent-color:var(--ink);
-  }
-  .option .label{
-    font-size:15.5px;
-  }
-  .option.is-selected{
-    border-color:var(--ink);
-  }
-  .option.is-correct{
-    border-color:var(--pine);
-    background:var(--pine-soft);
-  }
-  .option.is-wrong{
-    border-color:var(--wrong);
-    background:var(--wrong-soft);
-  }
+  .option:hover{ border-color:var(--red); }
+  .option input{ margin-top:3px; accent-color:var(--red); }
+  .option .label{ font-size:15px; color:var(--black); }
+  .option.is-correct{ border-color:var(--correct-line); background:var(--correct-bg); }
+  .option.is-wrong{ border-color:var(--wrong-line); background:var(--wrong-bg); }
 
-  .q-feedback{
-    margin-top:12px;
-    font-size:14.5px;
-    color:var(--ink-soft);
-    display:none;
-  }
+  .q-feedback{ margin-top:13px; font-size:14px; color:var(--gray); display:none; }
   .q-feedback.show{ display:block; }
   .q-feedback .verdict{
-    font-family:'IBM Plex Mono', monospace;
-    font-size:12.5px;
-    padding:2px 7px;
-    border-radius:3px;
-    margin-right:8px;
+    font-size:11.5px;
+    padding:2px 8px;
+    border-radius:2px;
+    margin-right:9px;
+    font-weight:700;
   }
-  .q-feedback .verdict.right{ background:var(--pine-soft); color:var(--pine); }
-  .q-feedback .verdict.wrong{ background:var(--wrong-soft); color:var(--wrong); }
+  .q-feedback .verdict.right{ background:var(--correct-bg); color:var(--correct-line); border:1px solid var(--correct-line); }
+  .q-feedback .verdict.wrong{ background:var(--wrong-bg); color:var(--red-dark); border:1px solid var(--red); }
 
   .grade-bar{
     margin-top:40px;
@@ -296,181 +250,612 @@
     gap:20px;
     flex-wrap:wrap;
   }
-  .grade-bar .hint{
+  .grade-bar .hint{ font-size:13.5px; color:var(--gray); }
+  .btn{
     font-size:14px;
-    color:var(--ink-soft);
+    font-weight:600;
+    padding:14px 26px;
+    border-radius:3px;
+    border:1px solid var(--red);
+    background:var(--red);
+    color:#fff;
+    cursor:pointer;
+    transition:background .15s ease;
   }
+  .btn:hover{ background:var(--red-dark); border-color:var(--red-dark); }
 
-  .stamp{
+  .score-line{
     display:none;
+    margin-top:40px;
+    padding:20px 24px;
+    border:1.5px solid var(--black);
     align-items:center;
-    gap:16px;
-    margin-top:36px;
-    padding:20px 22px;
-    border:2px solid var(--pine);
-    border-radius:4px;
-    background:var(--pine-soft);
+    gap:18px;
   }
-  .stamp.show{ display:flex; }
-  .stamp .score{
-    font-family:'Fraunces', serif;
-    font-weight:700;
-    font-size:32px;
-    color:var(--pine);
-    transform:rotate(-3deg);
-  }
-  .stamp .msg{
-    font-size:14.5px;
-    color:var(--ink);
-  }
+  .score-line.show{ display:flex; }
+  .score-line .score{ font-size:26px; font-weight:800; color:var(--red); }
+  .score-line .msg{ font-size:14px; color:var(--black); }
 
   footer{
-    padding:40px 0 60px;
-    font-family:'IBM Plex Mono', monospace;
-    font-size:12.5px;
-    color:var(--ink-soft);
+    text-align:center;
+    padding:32px 0 56px;
+    font-size:12px;
+    color:var(--gray-light);
+    border-top:1px solid var(--line);
   }
 </style>
 </head>
 <body>
 
-<div class="page">
-  <div class="wrap">
-
-    <!-- HERO -->
-    <section class="hero">
-      <div class="kicker">python&nbsp;basics <span class="dot">&middot;</span> a course for people who've never written a line of code</div>
-      <h1>Learn to think<br>in <em>Python</em>,<br>one line at a time.</h1>
-      <p class="lede">Six short modules, plain-language explanations, and a graded worksheet at the end of each one — so you know exactly what's sticking and what needs another look.</p>
-      <div class="hero-actions">
-        <a href="#modules" class="btn">See the modules</a>
-        <a href="#practice" class="btn ghost">Jump to practice</a>
-      </div>
-    </section>
-
-    <!-- MODULES -->
-    <section class="modules" id="modules">
-      <div class="section-head">
-        <h2>The course, in six parts</h2>
-        <div class="count">6 modules</div>
-      </div>
-      <div class="tabs">
-        <div class="tab"><span class="num">01</span><span class="name">Variables &amp; types</span></div>
-        <div class="tab"><span class="num">02</span><span class="name">Strings</span></div>
-        <div class="tab"><span class="num">03</span><span class="name">Conditionals</span></div>
-        <div class="tab"><span class="num">04</span><span class="name">Loops</span></div>
-        <div class="tab"><span class="num">05</span><span class="name">Functions</span></div>
-        <div class="tab"><span class="num">06</span><span class="name">Lists &amp; dicts</span></div>
-      </div>
-    </section>
-
-    <!-- WORKSHEET / QUIZ -->
-    <section class="worksheet" id="practice">
-      <div class="sheet-header">
-        <h2>Practice worksheet</h2>
-        <div class="meta" id="progress-meta">0 of 10 answered</div>
-      </div>
-
-      <div id="quiz-root"></div>
-
-      <div class="grade-bar">
-        <div class="hint">Answer what you can, then grade the sheet — wrong answers show the fix.</div>
-        <button class="btn" id="grade-btn">Grade my worksheet</button>
-      </div>
-
-      <div class="stamp" id="stamp">
-        <div class="score" id="stamp-score">0/10</div>
-        <div class="msg" id="stamp-msg"></div>
-      </div>
-    </section>
-
-    <footer>
-      made for a python basics course &middot; edit the QUESTIONS array to add more of your own
-    </footer>
-
+<div class="hero">
+  <div class="hero-inner">
+    <div class="course-code">MGCR 233 - 001</div>
+    <h1>Data Programming for Business</h1>
   </div>
 </div>
 
+<div class="wrap">
+
+  <div id="modules-root" class="modules-root">
+    <section class="info">
+      <h2>Course Information</h2>
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="k">Term and year</div>
+          <div class="v">Fall 2026</div>
+        </div>
+        <div class="info-item">
+          <div class="k">Section number</div>
+          <div class="v">001</div>
+        </div>
+        <div class="info-item">
+          <div class="k">Course schedule</div>
+          <div class="v">Tuesday and Thursday, 8:35 AM – 9:55 AM</div>
+        </div>
+        <div class="info-item">
+          <div class="k">Classroom</div>
+          <div class="v">ARMST 065</div>
+        </div>
+        <div class="info-item">
+          <div class="k">Need help?</div>
+          <div class="v"><a href="mailto:dugmee.hwang@mcgill.ca">dugmee.hwang@mcgill.ca</a></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="modules">
+      <div class="modules-head">
+        <h2>Modules</h2>
+        <div class="note">2 of the semester — more added as the course progresses</div>
+      </div>
+      <div id="module-list"></div>
+    </section>
+  </div>
+
+  <div id="quiz-view" class="quiz-view">
+    <button class="back-link" id="back-btn">&larr; Back to modules</button>
+    <div class="quiz-header">
+      <h2 id="quiz-title"></h2>
+    </div>
+
+    <div class="keypoints">
+      <div class="kp-label">Key points before you start</div>
+      <div class="kp-track" id="kp-track"></div>
+    </div>
+
+    <div class="quiz-progress" id="quiz-progress"></div>
+    <div id="quiz-root"></div>
+    <div class="grade-bar">
+      <div class="hint">Answer what you can, then submit to see the correct answers and explanations.</div>
+      <button class="btn" id="grade-btn">Submit answers</button>
+    </div>
+    <div class="score-line" id="score-line">
+      <div class="score" id="score-score">0/0</div>
+      <div class="msg" id="score-msg"></div>
+    </div>
+  </div>
+
+  <footer>MGCR 233 practice worksheets &middot; built from the course's weekly slides</footer>
+</div>
+
 <script>
-const QUESTIONS = [
+const MODULES = [
   {
-    topic: "variables & types",
-    prompt: "What is the type of <code>x = 7 / 2</code> in Python 3?",
-    options: ["int", "float", "str", "double"],
-    correct: 1,
-    explain: "The / operator always returns a float, even when both numbers are whole — 7 / 2 gives 3.5."
+    id: "w1",
+    title: "Introduction to Python",
+    sub: "Programming basics, the interpreter, statements, and common errors",
+    keyPoints: [
+      { title: "What is programming?", text: "Programming lets humans communicate with computers: programmers write code, the computer executes it, and sends results back." },
+      { title: "Elements of a program", text: "A program involves Input, Process, Output, and Variables — named storage that lets a program refer to data like x." },
+      { title: "Interpreter vs. script", text: "The interactive interpreter runs code line by line but is impractical for longer programs. Script execution — running a saved file — is the standard approach in practice." },
+      { title: "Core building blocks", text: "A statement is a complete instruction. Variables store values, expressions compute values, assignment (=) stores a value, and print() displays one." },
+      { title: "Precision matters", text: "Output must match exactly, including whitespace. Remember: = assigns while == compares, and < 10 differs from <= 10." },
+      { title: "Common errors", text: "Syntax, Runtime, Indentation, Value, Type, and Name errors all stop the program. A Logic Error is trickier — the program runs, but the result is wrong." }
+    ],
+    questions: [
+      {
+        topic: "programming basics",
+        prompt: "In general terms, what does programming let humans do?",
+        options: [
+          "Communicate with computers using languages the computer understands",
+          "Automatically fix errors in any code",
+          "Replace the need for input or output entirely",
+          "Store data without any instructions"
+        ],
+        correct: 0,
+        explain: "You've got it. Programming is really just a way for us to talk to computers, using a language they can understand and act on."
+      },
+      {
+        topic: "programming basics",
+        prompt: "Which element of a program is responsible for putting data somewhere, such as a file or screen?",
+        options: ["Input", "Process", "Output", "Variable"],
+        correct: 2,
+        explain: "That's right. Output is how a program shares its results with the world, whether that's a screen, a file, or somewhere else."
+      },
+      {
+        topic: "programming basics",
+        prompt: "In the equation x + y, what role does a variable like x play?",
+        options: [
+          "It refers to stored data the program can use",
+          "It is always the final result",
+          "It is a type of error",
+          "It only exists inside print()"
+        ],
+        correct: 0,
+        explain: "Exactly. Variables are like little labeled boxes that hold onto data, such as the values stored in x and y, so we can use them later."
+      },
+      {
+        topic: "programming basics",
+        prompt: "For the equation x + y, what is the correct order of steps a program follows?",
+        options: [
+          "Add the numbers, then request both numbers, then display the result",
+          "Request the first number, request the second number, add them, display the result",
+          "Display the result, then request both numbers",
+          "Request both numbers at the same time and skip storage"
+        ],
+        correct: 1,
+        explain: "Nice work. The program gathers both numbers first, does the math, and only then shows you the answer."
+      },
+      {
+        topic: "interpreter vs script",
+        prompt: "What is a key limitation of using the interactive interpreter directly?",
+        options: [
+          "It cannot execute any Python code",
+          "It becomes unwieldy for programs longer than a few lines",
+          "It requires a compiler",
+          "It cannot display output"
+        ],
+        correct: 1,
+        explain: "You're right to notice that. Typing every line by hand in the interpreter gets tiring fast, so it just isn't practical for longer programs."
+      },
+      {
+        topic: "interpreter vs script",
+        prompt: "Which method is most commonly used in current Python practice?",
+        options: ["Interactive interpreter only", "Script execution", "Neither is used", "Compiling to machine code first"],
+        correct: 1,
+        explain: "Well spotted. Saving your code in a file and running it as a script is what most programmers actually do day to day."
+      },
+      {
+        topic: "statements",
+        prompt: "Which of these is described as a 'complete program instruction' in Python?",
+        options: ["A statement", "A variable", "An identity", "A module only"],
+        correct: 0,
+        explain: "That's the one. A statement is a full instruction Python can carry out, and it might include a variable, an expression, an assignment, or a print()."
+      },
+      {
+        topic: "statements",
+        prompt: "What does an expression do in Python?",
+        options: ["Stores a value permanently", "Computes a value", "Displays a value on screen", "Deletes a variable"],
+        correct: 1,
+        explain: "You've nailed it. An expression is simply something that computes a value, like wage times hours times weeks working out to a number."
+      },
+      {
+        topic: "statements",
+        prompt: "In the line salary = wage * hours * weeks, what does the = symbol do?",
+        options: [
+          "Checks whether both sides are equal",
+          "Stores the computed value into the variable salary",
+          "Displays the result to the screen",
+          "Declares a new data type"
+        ],
+        correct: 1,
+        explain: "Good thinking. Assignment takes whatever the expression works out to be, in this case wage times hours times weeks, and tucks it away in the variable on the left."
+      },
+      {
+        topic: "statements",
+        prompt: "What is the purpose of the print() function?",
+        options: ["To request input from the user", "To store a value in memory", "To display a value on the screen", "To raise an error"],
+        correct: 2,
+        explain: "Correct. print() is your way of showing a value to whoever's using the program."
+      },
+      {
+        topic: "statements",
+        prompt: "If hours is reassigned from 40 to 35, what happens the next time salary is calculated using hours?",
+        options: [
+          "Nothing changes, since salary already has a value",
+          "The old value 40 is still used",
+          "The result reflects the new value 35",
+          "Python raises a NameError"
+        ],
+        correct: 2,
+        explain: "Exactly right. Once a variable gets a new value, the old one is gone for good, so anything calculated afterward uses the fresh value."
+      },
+      {
+        topic: "output details",
+        prompt: "Why does whitespace matter when checking a program's output?",
+        options: [
+          "It doesn't — Python ignores whitespace in output",
+          "Output must match the expected result exactly, including whitespace",
+          "Whitespace only matters inside variable names",
+          "It only matters for error messages"
+        ],
+        correct: 1,
+        explain: "Good catch. Programming rewards precision, so your output needs to match exactly, whitespace included."
+      },
+      {
+        topic: "output details",
+        prompt: "What is the key difference between = and == in Python?",
+        options: [
+          "There is no difference",
+          "= assigns a value, == checks for equality",
+          "= checks for equality, == assigns a value",
+          "Both only work with numbers"
+        ],
+        correct: 1,
+        explain: "You've got the distinction. The = sign assigns a value, while == asks a question: are these two things equal?"
+      },
+      {
+        topic: "output details",
+        prompt: "How do < 10 and <= 10 differ?",
+        options: [
+          "They are identical",
+          "<= 10 includes 10 in the range; < 10 does not",
+          "< 10 includes 10 in the range; <= 10 does not",
+          "Neither can be used with numbers"
+        ],
+        correct: 1,
+        explain: "That's it. <= 10 welcomes 10 into the club, while < 10 leaves it just outside the door."
+      },
+      {
+        topic: "errors",
+        prompt: "print \"Hello, World!\" (without parentheses) raises which kind of error in Python 3?",
+        options: ["ValueError", "SyntaxError", "NameError", "Logic Error"],
+        correct: 1,
+        explain: "Right idea. Python 3 needs parentheses around print's arguments, so leaving them off breaks the rules and raises a SyntaxError."
+      },
+      {
+        topic: "errors",
+        prompt: "What kind of error does number = 10 / 0 raise?",
+        options: ["Syntax Error", "Indentation Error", "Runtime Error (ZeroDivisionError)", "Logic Error"],
+        correct: 2,
+        explain: "You've spotted it. The code is written correctly, but asking Python to divide by zero is something it simply can't do, so it raises a ZeroDivisionError at runtime."
+      },
+      {
+        topic: "errors",
+        prompt: "A line of code is correct but has extra, unwanted whitespace before it, like '    print(\"Hello\")' where it shouldn't be indented. What error does this cause?",
+        options: ["TypeError", "IndentationError", "NameError", "ValueError"],
+        correct: 1,
+        explain: "Good eye. Python leans on indentation to understand your code's structure, so a stray bit of whitespace throws things off with an IndentationError."
+      },
+      {
+        topic: "errors",
+        prompt: "Y = int(\"Hello, World!\") raises which error?",
+        options: ["ValueError", "TypeError", "NameError", "SyntaxError"],
+        correct: 0,
+        explain: "That's the one. Python can't turn that text into a number, so it raises a ValueError to let you know."
+      },
+      {
+        topic: "errors",
+        prompt: "Y = 10 + \"Hello, World!\" raises which error?",
+        options: ["ValueError", "TypeError", "IndentationError", "NameError"],
+        correct: 1,
+        explain: "Exactly. Mixing an integer and a string with + doesn't make sense to Python, so it raises a TypeError."
+      },
+      {
+        topic: "errors",
+        prompt: "weekday = Monday (where Monday was never defined) raises which error, and a logic error like using + instead of * differs from it because:",
+        options: [
+          "NameError; a logic error still crashes the program the same way",
+          "NameError; a logic error runs without crashing but produces the wrong result",
+          "TypeError; a logic error always raises an exception",
+          "ValueError; a logic error is identical to a syntax error"
+        ],
+        correct: 1,
+        explain: "You're right on both counts. An undefined name raises a NameError, while a logic error is sneakier: the program runs just fine, but quietly gives you the wrong answer, which is what makes it so easy to miss."
+      }
+    ]
   },
   {
-    topic: "variables & types",
-    prompt: "Which line correctly creates a variable holding the text <code>hello</code>?",
-    options: ["var greeting = hello", "greeting = \"hello\"", "greeting == \"hello\"", "string greeting = hello"],
-    correct: 1,
-    explain: "Python needs no type keyword — a single = assigns, and quotes mark a string."
-  },
-  {
-    topic: "strings",
-    prompt: "What does <code>\"Py\" + \"thon\"</code> evaluate to?",
-    options: ["PyThon", "Py thon", "Python", "an error"],
-    correct: 2,
-    explain: "+ on two strings concatenates them directly with no added space: \"Python\"."
-  },
-  {
-    topic: "strings",
-    prompt: "What does <code>\"coding\"[1:4]</code> return?",
-    options: ["cod", "odi", "codi", "oding"],
-    correct: 1,
-    explain: "Slicing [1:4] takes indices 1, 2, 3 — the letters o, d, i."
-  },
-  {
-    topic: "conditionals",
-    prompt: "Which keyword checks an additional condition after an <code>if</code> has failed?",
-    options: ["elseif", "elif", "else if", "or if"],
-    correct: 1,
-    explain: "Python's keyword is elif — a contraction of else and if, on one word."
-  },
-  {
-    topic: "conditionals",
-    prompt: "What does this print?  <code>x = 4\\nif x > 5:\\n  print(\"big\")\\nelse:\\n  print(\"small\")</code>",
-    options: ["big", "small", "nothing", "an error"],
-    correct: 1,
-    explain: "4 is not greater than 5, so the condition is False and the else branch runs, printing small."
-  },
-  {
-    topic: "loops",
-    prompt: "How many times does <code>for i in range(3):</code> run its body?",
-    options: ["2", "3", "4", "It depends on i"],
-    correct: 1,
-    explain: "range(3) produces 0, 1, 2 — three values, so the loop body runs three times."
-  },
-  {
-    topic: "loops",
-    prompt: "Which loop keeps running as long as a condition stays true, rather than a fixed number of times?",
-    options: ["for", "while", "range", "repeat"],
-    correct: 1,
-    explain: "A while loop re-checks its condition each pass and stops the moment it's False."
-  },
-  {
-    topic: "functions",
-    prompt: "What keyword starts a function definition in Python?",
-    options: ["func", "function", "def", "define"],
-    correct: 2,
-    explain: "Functions are declared with def, followed by a name and parentheses."
-  },
-  {
-    topic: "lists & dicts",
-    prompt: "What does <code>len({\"a\": 1, \"b\": 2})</code> return?",
-    options: ["1", "2", "4", "an error"],
-    correct: 1,
-    explain: "len() on a dictionary counts its key–value pairs — there are two: a and b."
+    id: "w2",
+    title: "Variable and Expression",
+    sub: "Identifiers, objects, numeric types, arithmetic, and modules",
+    keyPoints: [
+      { title: "Variables can change", text: "Variables are named references to values in memory and can be reassigned at any time — x = x + 1 updates x based on its old value." },
+      { title: "Identifier rules", text: "Names start with a letter or underscore, use only letters/digits/underscores, allow no spaces or reserved words, and are case-sensitive. Avoid double underscores like __init__." },
+      { title: "Every object has 3 properties", text: "Value (the actual data), Type (defines valid operations, e.g. int vs. string), and Identity (a unique memory reference, viewable with id())." },
+      { title: "Numeric types & precedence", text: "int and float are the core numeric types; floats support scientific notation (6.02e23). Precedence order: () → ** → unary − → * / % → + −." },
+      { title: "Division, modulo, compound ops", text: "/ gives true (float) division, // gives floor division, % gives the remainder. Compound operators like += update a variable in place." },
+      { title: "Modules extend Python", text: "import math and import random unlock functions like sqrt(), random(), randint(); ord()/chr() convert characters to Unicode and back; \\n and \\t are escape sequences." }
+    ],
+    questions: [
+      {
+        topic: "variable assignment",
+        prompt: "After running the code below, what is the final value of x?\nx = 5\nx = x + 3\nx = x * 2",
+        options: ["8", "10", "16", "Error"],
+        correct: 2,
+        explain: "Well done. Each assignment builds on the last: x becomes 8 after adding 3, and then doubling that gives you 16."
+      },
+      {
+        topic: "identifiers",
+        prompt: "Which of the following are valid Python variable names?\na) 2cats  b) cat_2  c) my cat  d) _price  e) True  f) totalPrice",
+        options: ["a, c, e", "b, d, f", "a, b, c", "d, e, f only"],
+        correct: 1,
+        explain: "You worked through that carefully. Names can't start with a digit, so 2cats is out, spaces aren't allowed, so my cat is out, and reserved words like True are off limits too. That leaves cat_2, _price, and totalPrice as your valid names."
+      },
+      {
+        topic: "objects",
+        prompt: "In the code x = 10 / print(type(x)), which term correctly describes x itself?",
+        options: ["object/value", "type/class", "variable/name", "identity"],
+        correct: 2,
+        explain: "Exactly right. x is simply the name we're using, and it points to the object 10, which happens to be of type int."
+      },
+      {
+        topic: "object properties",
+        prompt: "Which function reveals an object's type — the kind of object it is?",
+        options: ["print()", "type()", "id()", "input()"],
+        correct: 1,
+        explain: "That's correct. type() tells you what kind of object you're working with, while print() shows its value and id() reveals its identity."
+      },
+      {
+        topic: "identity",
+        prompt: "a = [1, 2]  and  b = [1, 2]. Do a and b have the same value? Do they necessarily have the same identity?",
+        options: [
+          "Same value: no. Same identity: yes.",
+          "Same value: yes. Same identity: no, not necessarily.",
+          "Neither value nor identity are the same.",
+          "Both value and identity are always identical."
+        ],
+        correct: 1,
+        explain: "Good thinking. Both lists hold the same values, so they compare as equal, but Python creates them separately, so they can still be two distinct objects with their own identities."
+      },
+      {
+        topic: "numeric types",
+        prompt: "Given: x = 1, y = 2, z = x / y — which are floating-point literals, and what type is z?\na) 5  b) 5.0  c) 0.25  d) 1.0e3  e) x / y",
+        options: [
+          "a, b — z is int",
+          "b, c, d — z is float",
+          "a, c, e — z is float",
+          "b, d — z is int"
+        ],
+        correct: 1,
+        explain: "Nice work sorting those out. A literal is just a value written straight into your code, and 5.0, 0.25, and 1.0e3 are all written as floats. Since / always hands back a float, z ends up being a float too."
+      },
+      {
+        topic: "f-strings",
+        prompt: "pi = 3.14159265\nprint(f\"{pi:.3f}\")\nWhat does this print, and what does the 3 mean in .3f?",
+        options: [
+          "3.14 — shows 2 digits after the decimal",
+          "3.142 — shows 3 digits after the decimal, rounded",
+          "3.14159265 — .3f has no effect",
+          "3 — truncates to a whole number"
+        ],
+        correct: 1,
+        explain: "You've got it. The 3 in .3f tells Python to show three digits after the decimal point, and the f means fixed point notation, so the value gets rounded to 3.142."
+      },
+      {
+        topic: "expressions",
+        prompt: "Evaluate: 3 + 2 * (5 - 1) ** 2",
+        options: ["35", "32", "20", "13"],
+        correct: 0,
+        explain: "Let's walk through it together: (5 minus 1) gives 4, then 4 squared gives 16, then 2 times 16 gives 32, and finally 3 plus 32 lands on 35."
+      },
+      {
+        topic: "compound operators",
+        prompt: "x = 10\nx += 2\nx *= 3\nWhat is the final value of x, and what is score += 5 shorthand for?",
+        options: [
+          "x = 30; shorthand for score = score * 5",
+          "x = 36; shorthand for score = score + 5",
+          "x = 32; shorthand for score = 5",
+          "x = 16; shorthand for score = score - 5"
+        ],
+        correct: 1,
+        explain: "Nicely done. Ten becomes 12 after the += 2, and then multiplying by 3 brings it to 36. And yes, score += 5 is just a shorter way of writing score = score + 5."
+      },
+      {
+        topic: "division & modulo",
+        prompt: "print(17 / 5)\nprint(17 // 5)\nprint(17 % 5)\nprint(24 // 10.0)\nWhat do these four lines print, in order?",
+        options: [
+          "3.4, 3, 2, 2.0",
+          "3.4, 4, 2, 2",
+          "3, 3, 2, 2.0",
+          "3.4, 3, 7, 2.4"
+        ],
+        correct: 0,
+        explain: "You've covered all the bases. / gives you a precise floating point answer of 3.4, // rounds down to 3, % leaves you with the remainder of 2, and since one number involved is already a float, // returns 2.0 as a float too."
+      },
+      {
+        topic: "math module",
+        prompt: "After import math, what does math.sqrt(49) return?",
+        options: ["49", "7", "7.0", "An error, since sqrt is not in math"],
+        correct: 2,
+        explain: "That's right. math.sqrt() finds the square root and hands it back as a float, so you get 7.0."
+      },
+      {
+        topic: "random module",
+        prompt: "Which statement generates a random floating-point number in the range 0 (inclusive) to 1 (exclusive)?",
+        options: ["random.randint(0, 1)", "random.random()", "random.randrange(1)", "random.uniform(0, 0)"],
+        correct: 1,
+        explain: "Exactly. random.random() gives you a random float that can be as low as 0 but never quite reaches 1."
+      },
+      {
+        topic: "random module",
+        prompt: "What is the key difference between random.randint(1, 10) and random.randrange(1, 10)?",
+        options: [
+          "randint excludes 10; randrange includes 10",
+          "randint includes 10; randrange excludes 10 (goes up to 9)",
+          "They behave identically",
+          "randrange only works with floats"
+        ],
+        correct: 1,
+        explain: "Good catch. randint(a, b) includes both endpoints, while randrange(a, b) stops just short of b, so it only goes up to 9."
+      },
+      {
+        topic: "representing text",
+        prompt: "What does ord('A') return, based on Unicode code points?",
+        options: ["65", "97", "1", "A"],
+        correct: 0,
+        explain: "That's correct. ord() looks up a character's Unicode code point, and for the letter 'A' that value is 65."
+      },
+      {
+        topic: "representing text",
+        prompt: "Which escape sequence starts a new line inside a Python string?",
+        options: ["\\t", "\\n", "\\\\", "\\'"],
+        correct: 1,
+        explain: "You've got it. \n starts a new line in your output, while \t adds a tab space instead."
+      },
+      {
+        topic: "numeric types",
+        prompt: "How should 0.000001 be written as a floating-point literal in scientific notation, with one digit before and after the decimal point?",
+        options: ["1.0e-6", "0.1e-5", "1e6", "10.0e-7"],
+        correct: 0,
+        explain: "Well done. Scientific notation uses an 'e' before the power of ten, so 0.000001, which is 1 times 10 to the negative 6, is written as 1.0e-6."
+      },
+      {
+        topic: "rounding functions",
+        prompt: "What does round(4.567, 2) return?",
+        options: ["4.5", "4.56", "4.57", "5"],
+        correct: 2,
+        explain: "That's right. round(x, n) rounds to n decimal places using the usual rounding rules, so this one comes out to 4.57."
+      },
+      {
+        topic: "rounding functions",
+        prompt: "What does int(4.9) return, and does it round?",
+        options: [
+          "5 — it rounds to the nearest integer",
+          "4 — it truncates, it does not round",
+          "4.9 — int() has no effect on floats",
+          "An error, since 4.9 is not an integer"
+        ],
+        correct: 1,
+        explain: "Good instinct to check that. int() simply chops off the decimal part rather than rounding, so int(4.9) gives you 4, not 5."
+      },
+      {
+        topic: "arithmetic tricks",
+        prompt: "Given x = 237, which expression extracts the tens digit (3)?",
+        options: ["x % 10", "(x // 10) % 10", "x // 100", "x % 100 // 10 // 10"],
+        correct: 1,
+        explain: "Nice work reasoning through it. Dividing by 10 first clears away the ones digit, giving 23, and then taking the remainder when divided by 10 leaves you with 3."
+      },
+      {
+        topic: "identifiers",
+        prompt: "Double underscores, like in __init__, are technically allowed in a variable name. What's the general guidance around using them?",
+        options: [
+          "They should be used for all variable names",
+          "They should generally be avoided; single underscores are fine",
+          "They are illegal and will raise a SyntaxError",
+          "They only work for numeric variables"
+        ],
+        correct: 1,
+        explain: "That's the spirit of it. Double underscores are technically allowed, but it's kinder to your future self and other readers to stick with single underscores when naming your own variables."
+      }
+    ]
   }
 ];
 
-const root = document.getElementById('quiz-root');
-const answers = new Array(QUESTIONS.length).fill(null);
+const listEl = document.getElementById('module-list');
+const modulesRoot = document.getElementById('modules-root');
+const quizView = document.getElementById('quiz-view');
+const quizRoot = document.getElementById('quiz-root');
+const quizTitle = document.getElementById('quiz-title');
+const quizProgress = document.getElementById('quiz-progress');
+const kpTrack = document.getElementById('kp-track');
+const scoreLine = document.getElementById('score-line');
+const scoreScore = document.getElementById('score-score');
+const scoreMsg = document.getElementById('score-msg');
 
-function render(){
-  root.innerHTML = '';
-  QUESTIONS.forEach((q, qi) => {
+let currentModule = null;
+let answers = [];
+
+function renderModuleList(){
+  listEl.innerHTML = '';
+  MODULES.forEach((m, i) => {
+    const row = document.createElement('div');
+    row.className = 'module-row';
+    row.innerHTML = `
+      <div class="m-num">${String(i + 1).padStart(2, '0')}</div>
+      <div class="m-body">
+        <div class="m-title">${m.title}</div>
+        <div class="m-sub">${m.sub}</div>
+      </div>
+      <div class="m-count">${m.questions.length} questions</div>
+    `;
+    row.addEventListener('click', () => openModule(m));
+    listEl.appendChild(row);
+  });
+}
+
+function renderKeyPoints(m){
+  kpTrack.innerHTML = '';
+  m.keyPoints.forEach((kp, i) => {
+    const card = document.createElement('div');
+    card.className = 'kp-card';
+    card.innerHTML = `
+      <div>
+        <div class="kp-num">${String(i + 1).padStart(2, '0')} / ${String(m.keyPoints.length).padStart(2, '0')}</div>
+        <div class="kp-title">${escapeHtml(kp.title)}</div>
+      </div>
+      <div class="kp-text">${escapeHtml(kp.text)}</div>
+    `;
+    kpTrack.appendChild(card);
+  });
+}
+
+function openModule(m){
+  currentModule = m;
+  answers = new Array(m.questions.length).fill(null);
+  quizTitle.textContent = m.title;
+  scoreLine.classList.remove('show');
+  renderKeyPoints(m);
+  renderQuiz();
+  modulesRoot.classList.add('hide');
+  quizView.classList.add('show');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function closeModule(){
+  modulesRoot.classList.remove('hide');
+  quizView.classList.remove('show');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function escapeHtml(str){
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function formatPrompt(text){
+  if (text.includes('\n')) {
+    return text.split('\n').map(p => escapeHtml(p)).join('<br>');
+  }
+  return escapeHtml(text);
+}
+
+function updateProgress(){
+  const answered = answers.filter(a => a !== null).length;
+  quizProgress.textContent = `${answered} of ${currentModule.questions.length} answered`;
+}
+
+function clearFeedback(qi){
+  const fb = document.getElementById('feedback-' + qi);
+  fb.classList.remove('show');
+  fb.innerHTML = '';
+  document.querySelectorAll(`.option[data-qi="${qi}"]`).forEach(o => {
+    o.classList.remove('is-correct', 'is-wrong');
+  });
+}
+
+function renderQuiz(){
+  quizRoot.innerHTML = '';
+  currentModule.questions.forEach((q, qi) => {
     const qDiv = document.createElement('div');
     qDiv.className = 'question';
 
@@ -486,7 +871,7 @@ function render(){
 
     const prompt = document.createElement('div');
     prompt.className = 'q-prompt';
-    prompt.innerHTML = q.prompt;
+    prompt.innerHTML = formatPrompt(q.prompt);
 
     const topic = document.createElement('div');
     topic.className = 'q-topic';
@@ -532,27 +917,14 @@ function render(){
     row.appendChild(idx);
     row.appendChild(body);
     qDiv.appendChild(row);
-    root.appendChild(qDiv);
+    quizRoot.appendChild(qDiv);
   });
-}
-
-function clearFeedback(qi){
-  const fb = document.getElementById('feedback-' + qi);
-  fb.classList.remove('show');
-  fb.innerHTML = '';
-  document.querySelectorAll(`.option[data-qi="${qi}"]`).forEach(o => {
-    o.classList.remove('is-correct', 'is-wrong');
-  });
-}
-
-function updateProgress(){
-  const answered = answers.filter(a => a !== null).length;
-  document.getElementById('progress-meta').textContent = `${answered} of ${QUESTIONS.length} answered`;
+  updateProgress();
 }
 
 document.getElementById('grade-btn').addEventListener('click', () => {
   let score = 0;
-  QUESTIONS.forEach((q, qi) => {
+  currentModule.questions.forEach((q, qi) => {
     const fb = document.getElementById('feedback-' + qi);
     const chosen = answers[qi];
     const isRight = chosen === q.correct;
@@ -565,25 +937,24 @@ document.getElementById('grade-btn').addEventListener('click', () => {
     });
 
     fb.innerHTML = chosen === null
-      ? `<span class="verdict wrong">skipped</span>${q.explain}`
+      ? `<span class="verdict wrong">skipped</span>${escapeHtml(q.explain)}`
       : isRight
-        ? `<span class="verdict right">correct</span>${q.explain}`
-        : `<span class="verdict wrong">not quite</span>${q.explain}`;
+        ? `<span class="verdict right">correct</span>${escapeHtml(q.explain)}`
+        : `<span class="verdict wrong">not quite</span>${escapeHtml(q.explain)}`;
     fb.classList.add('show');
   });
 
-  const stamp = document.getElementById('stamp');
-  const stampScore = document.getElementById('stamp-score');
-  const stampMsg = document.getElementById('stamp-msg');
-  stampScore.textContent = `${score}/${QUESTIONS.length}`;
-  stampMsg.textContent = score === QUESTIONS.length
-    ? "Clean sheet — every question landed."
-    : `Review the marked-up questions above, then try the sheet again.`;
-  stamp.classList.add('show');
-  stamp.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  scoreScore.textContent = `${score}/${currentModule.questions.length}`;
+  scoreMsg.textContent = score === currentModule.questions.length
+    ? "Every question answered correctly."
+    : "Review the marked questions above, then try the set again.";
+  scoreLine.classList.add('show');
+  scoreLine.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 });
 
-render();
+document.getElementById('back-btn').addEventListener('click', closeModule);
+
+renderModuleList();
 </script>
 
 </body>
