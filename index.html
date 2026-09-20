@@ -181,7 +181,7 @@
     <section class="modules">
       <div class="modules-head">
         <h2>Start Practice</h2>
-        <div class="note">Each module has 15 programming questions and 5 concept or logic questions.</div>
+        <div class="note">Each practice set has 15 programming questions and 5 concept or logic questions.</div>
       </div>
       <div id="module-list"></div>
     </section>
@@ -285,6 +285,87 @@ const MODULES = [
       {type:"logic",topic:"division operators",prompt:"Which statement correctly distinguishes /, //, and % for positive integers?",options:["/ gives true division, // gives floor division, and % gives the modulo result","/ and // always give the same value","% performs percentage formatting","// always rounds to the nearest integer"],correct:0,explain:"The three operators serve different purposes. / performs true division, // performs floor division, and % returns the modulo result."},
       {type:"logic",topic:"rounding",prompt:"Which statement about Python rounding is most accurate?",options:["int() and round() always produce the same result","round(x, n) always rounds every 5 upward","int() truncates toward zero, while round() performs rounding; exact halfway behavior can follow round-to-even","floor division and round() are identical"],correct:2,explain:"int() truncates toward zero. round() performs rounding, and exact halfway cases use round-to-even behavior. Floating-point representation can also affect whether a decimal value is represented as an exact halfway case."}
     ]
+  },
+  {
+    id: "w3",
+    title: "Types and Collections",
+    sub: "Strings, formatting, lists, tuples, sets, dictionaries, and type conversion",
+    concepts: [
+      { title: "String Literals", text: "A string is an ordered sequence of characters. A string literal surrounds text with matching single or double quotation marks." },
+      { title: "String Indexing", text: "Indexes count from 0 at the left. Negative indexes count from the right, so -1 identifies the last character." },
+      { title: "String Length", text: "len(text) returns the number of characters in a string, including spaces and punctuation." },
+      { title: "String Immutability", text: "Individual string characters cannot be replaced by indexed assignment. Build a new string when text needs to change." },
+      { title: "String Slicing", text: "text[start:end] includes the start index and excludes the end index. Omitting either boundary continues to that end of the string." },
+      { title: "String Concatenation", text: "+ joins strings without inserting a space. Both operands must be strings, or Python raises TypeError." },
+      { title: "f-Strings", text: "An f-string begins with f before the quote. Expressions inside replacement fields, written with braces, are evaluated when the string is created." },
+      { title: "Debugging Fields", text: "A replacement field ending in = displays the expression text, an equals sign, and its value, such as f'{2**3=}' producing 2**3=8." },
+      { title: "Literal Braces", text: "Double braces in an f-string produce literal braces: f'{{2}}' displays {2}." },
+      { title: "Format Specifications", text: "A colon separates a replacement field's value from its format. For example, .2f displays fixed-point notation with two decimal places." },
+      { title: "Presentation Types", text: "Common format types include s for strings, d for decimal integers, e for exponent notation, and f for fixed-point notation." },
+      { title: "List Basics", text: "A list is an ordered, mutable container written with square brackets. It may hold values of different types and may contain duplicates." },
+      { title: "List Access and Update", text: "Lists support positive and negative indexes. Assignment to an indexed position replaces the element because lists are mutable." },
+      { title: "List Addition", text: "list.append(value) adds one value to the end. The + operator creates a new list by concatenating two lists." },
+      { title: "List Removal", text: "list.pop(i) removes the item at index i. list.remove(value) removes the first element equal to that value." },
+      { title: "List Functions and Methods", text: "len(), min(), max(), and sum() operate on suitable lists. index() finds a first matching position, while count() reports occurrences." },
+      { title: "Tuple Basics", text: "A tuple is an ordered sequence commonly written with parentheses. It supports len() and indexing but its elements cannot be reassigned." },
+      { title: "When to Use Tuples", text: "Tuples are useful when position matters and values should not change, such as a latitude-longitude pair." },
+      { title: "Set Basics", text: "A set is an unordered collection of unique elements. It has no positional index, and converting a list to a set removes duplicates." },
+      { title: "Set Mutation", text: "add() inserts an element. remove() raises KeyError when the value is missing, while discard() does nothing in that case." },
+      { title: "Set Operations", text: "union() combines unique elements, intersection() keeps common elements, difference() keeps left-only elements, and symmetric_difference() keeps elements in exactly one set." },
+      { title: "Dictionary Basics", text: "A dictionary is a mutable mapping of unique keys to values. Curly braces contain key:value pairs, and values are accessed by key rather than position." },
+      { title: "Dictionary Changes", text: "Assigning dict[key] adds a new entry or replaces an existing key's value. del and pop(key) remove entries; a missing requested key can raise KeyError." },
+      { title: "Review: Arithmetic Precedence", text: "Python evaluates parentheses first, then exponentiation, unary signs, multiplication/division/modulo, and finally addition/subtraction. Equal-precedence operations generally proceed left to right." },
+      { title: "Review: Random Bounds", text: "randint(a, b) includes both endpoints. randrange(start, stop) includes start but excludes stop; random() returns a float from 0 inclusive to 1 exclusive." },
+      { title: "Type Conversion", text: "int(), float(), and str() explicitly create values of those types. int() drops a float's fractional part toward zero, and mixed int-float arithmetic produces a float." }
+    ],
+    examples: [
+      { title: "Example 1: Positive and negative string indexes", code: "country = \"Canada\"\nprint(country[1])\nprint(country[-1])", text: "The outputs are a and a. Index 1 is the second character, while -1 is the final character." },
+      { title: "Example 2: String length", code: "label = \"ABC ABC\"\nprint(len(label))", text: "The output is 7 because the space between the two groups is also a character." },
+      { title: "Example 3: String immutability", code: "word = \"Cat\"\nword[0] = \"B\"", text: "The indexed assignment raises TypeError because a string does not support item assignment." },
+      { title: "Example 4: Slicing and concatenation", code: "a = \"Hello \"\nb = \"World\"\ntext = a[:-1] + b\nprint(text)", text: "a[:-1] omits the trailing space. Concatenation then produces HelloWorld." },
+      { title: "Example 5: Concatenation needs strings", code: "items = 3\nmessage = \"Items: \" + str(items)\nprint(message)", text: "str(items) converts the integer before concatenation, so the output is Items: 3." },
+      { title: "Example 6: Basic f-string", code: "name = \"Emily\"\ncats = 2\nprint(f\"{name} has {cats} cats.\")", text: "The replacement fields insert the current values, producing Emily has 2 cats." },
+      { title: "Example 7: Expression in an f-string", code: "num_items = 3\ncost_taco = 1.25\nprint(f\"{num_items} tacos cost {cost_taco * num_items}\")", text: "The expression is evaluated before insertion, so the output ends with 3.75." },
+      { title: "Example 8: Debugging expression and literal braces", code: "print(f\"{2**3=}\")\nprint(f\"{{2}}\")", text: "The lines display 2**3=8 and {2}. The = preserves the expression text; doubled braces produce braces." },
+      { title: "Example 9: Fixed-point precision", code: "pi = 3.1415926\nprint(f\"The value of pi is {pi:.3f}\")", text: "The .3f format displays three digits after the decimal point, producing 3.142." },
+      { title: "Example 10: Integer grouping", code: "revenue = 7600\nprint(f\"{revenue:,d}\")", text: "The comma option groups thousands and d presents the integer in decimal form, producing 7,600." },
+      { title: "Example 11: List access and update", code: "colors = [\"red\", \"blue\", \"green\"]\nprint(colors[1])\ncolors[1] = \"yellow\"\nprint(colors[1])", text: "The first output is blue. The update is allowed because lists are mutable, so the second is yellow." },
+      { title: "Example 12: Append to a list", code: "values = [1, 2, 3]\nvalues.append(\"abc\")\nprint(values)", text: "append() adds one element at the end, producing [1, 2, 3, 'abc']." },
+      { title: "Example 13: Pop by index and remove by value", code: "values = [1, 2, 3, 2]\nvalues.pop(0)\nvalues.remove(2)\nprint(values)", text: "pop(0) removes the first item. remove(2) then removes the first remaining 2, leaving [3, 2]." },
+      { title: "Example 14: List functions", code: "a = [1, 2, 3, 4]\nb = [2, 3, 4, 5]\nc = a + b\nprint(len(c), max(c), c.count(2))", text: "Concatenation gives eight elements. The maximum is 5, and 2 occurs twice, so the output is 8 5 2." },
+      { title: "Example 15: Tuple access", code: "coordinates = (38.9, 77.9)\nprint(len(coordinates))\nprint(coordinates[0])", text: "A tuple supports sequence operations, so the outputs are 2 and 38.9." },
+      { title: "Example 16: Tuple immutability", code: "coordinates = (38.9, 77.9)\ncoordinates[0] = 39.9", text: "The assignment raises TypeError because tuple elements cannot be changed after creation." },
+      { title: "Example 17: Remove duplicates with a set", code: "values = [100, 200, 100, 300]\nunique_values = set(values)\nprint(len(unique_values))", text: "The set contains three unique values, so len() returns 3. The printed element order is not guaranteed." },
+      { title: "Example 18: Set union and intersection", code: "a = {1, 2, 3, 4}\nb = {2, 3, 5}\nprint(a.union(b))\nprint(a.intersection(b))", text: "The union contains 1, 2, 3, 4, and 5. The intersection contains only 2 and 3; display order may vary." },
+      { title: "Example 19: Safe set removal", code: "letters = {\"a\", \"b\"}\nletters.discard(\"z\")\nprint(letters)", text: "discard() leaves the set unchanged when z is absent and does not raise an error." },
+      { title: "Example 20: Dictionary access and update", code: "ages = {\"Bob\": 27, \"Frank\": 75}\nages[\"Bob\"] = 28\nages[\"Joe\"] = 5\nprint(ages[\"Bob\"], ages[\"Joe\"])", text: "An existing key is updated and a new key is added, so the output is 28 5." },
+      { title: "Example 21: Dictionary removal", code: "players = {\"Messi\": 10, \"Ronaldo\": 7}\ndel players[\"Ronaldo\"]\nprint(players[\"Messi\"])", text: "Deleting one key-value pair leaves Messi mapped to 10, which is printed." },
+      { title: "Example 22: Explicit and implicit conversion", code: "text = \"7.99\"\namount = float(text)\nwhole = int(amount)\nprint(amount + 2, whole, str(whole))", text: "float() creates 7.99; adding an integer produces 9.99, int() truncates to 7, and str() creates the text '7'." },
+      { title: "Example 23: Review arithmetic precedence", code: "result = 3 + 2 * (5 - 1) ** 2\nprint(result)", text: "Parentheses give 4, exponentiation gives 16, multiplication gives 32, and the final addition gives 35." },
+      { title: "Example 24: Review random bounds", code: "import random\na = random.randint(5, 10)\nb = random.randrange(0, 5)\nprint(a + b)", text: "a can be 5 through 10 and b can be 0 through 4, so the sum can be any integer from 5 through 14." }
+    ],
+    questions: [
+      {type:"programming",topic:"string indexing",prompt:"What does this code print?\nword = \"Canada\"\nprint(word[1], word[-1])",options:["C a","a a","a d","C d"],correct:1,explain:"Index 1 is the second character, a. Index -1 is the final character, also a."},
+      {type:"programming",topic:"string immutability",prompt:"What happens when this code runs?\nword = \"Cat\"\nword[0] = \"B\"",options:["word becomes Bat","word becomes BCat","Python raises TypeError","Python raises KeyError"],correct:2,explain:"Strings are immutable, so assigning to an indexed character raises TypeError."},
+      {type:"programming",topic:"concatenation and slicing",prompt:"What does this code print?\na = \"Hello \"\nb = \"World\"\nprint(a[:-1] + b)",options:["Hello World","HelloWorld","Hello  World","Error"],correct:1,explain:"a[:-1] excludes a's trailing space, and + joins the two resulting strings without adding one."},
+      {type:"programming",topic:"f-string expressions",prompt:"What does this code print?\nitems = 3\nprice = 1.25\nprint(f\"{items} tacos cost {items * price}\")",options:["3 tacos cost 1.25","3 tacos cost 3.75","items tacos cost items * price","3 tacos cost 4.25"],correct:1,explain:"The replacement fields evaluate to 3 and 3 * 1.25, which is 3.75."},
+      {type:"programming",topic:"f-string debugging",prompt:"What does this code print?\nprint(f\"{2**3=} total\")",options:["2**3= total","2**3=3 total","2**3=8 total","8=2**3 total"],correct:2,explain:"The = form displays the expression text and its value. Since 2 ** 3 is 8, the output is 2**3=8 total."},
+      {type:"programming",topic:"format specification",prompt:"Which statement prints exactly 3.142 when pi = 3.1415926?",options:["print(f\"{pi}\")","print(f\"{pi:3f}\")","print(f\"{pi:.3f}\")","print(f\"{pi.3f}\")"],correct:2,explain:"The colon begins the format specification and .3f requests fixed-point output with three decimal places."},
+      {type:"programming",topic:"list update",prompt:"What does this code print?\ncolors = [\"red\", \"blue\", \"green\"]\ncolors[-1] = \"yellow\"\nprint(colors[2])",options:["green","yellow","blue","Error"],correct:1,explain:"Indexes -1 and 2 refer to the last element. The assignment changes that element to yellow."},
+      {type:"programming",topic:"list removal",prompt:"What does this code print?\nvalues = [1, 2, 3, 4]\nvalues.append(\"abc\")\nvalues.pop(1)\nvalues.remove(1)\nprint(values)",options:["[1, 2, 3, 4, 'abc']","[2, 3, 4, 'abc']","[3, 4, 'abc']","[3, 4]"],correct:2,explain:"append adds 'abc'; pop(1) removes 2; remove(1) then removes the value 1, leaving [3, 4, 'abc']."},
+      {type:"programming",topic:"list functions",prompt:"What does this code print?\na = [1, 2, 3, 4]\nb = [2, 3, 4, 5]\nc = a + b\nprint(len(c), max(c))",options:["8 4","8 5","4 4","4 5"],correct:1,explain:"List concatenation produces eight elements, and the largest value in the combined list is 5."},
+      {type:"programming",topic:"tuples",prompt:"What happens when this code runs?\npoint = (38.9, 77.9)\npoint[0] = 39.9",options:["point becomes (39.9, 77.9)","point becomes [39.9, 77.9]","Python raises TypeError","Python raises KeyError"],correct:2,explain:"A tuple is immutable, so its elements cannot be replaced by indexed assignment."},
+      {type:"programming",topic:"set conversion",prompt:"What does this code print?\nvalues = set([100, 200, 100, 200, 300])\nprint(len(values))",options:["3","5","300","Error"],correct:0,explain:"A set keeps unique values only, so it contains 100, 200, and 300 and has length 3."},
+      {type:"programming",topic:"set operations",prompt:"What is the value of common?\na = {1, 2, 3, 4}\nb = {2, 3, 5}\ncommon = a.intersection(b)",options:["{1, 2, 3, 4, 5}","{1, 4}","{2, 3}","{5}"],correct:2,explain:"intersection() returns elements present in both sets. Only 2 and 3 meet that condition."},
+      {type:"programming",topic:"dictionaries",prompt:"What does this code print?\nprofile = {\"name\": \"Amy\", \"age\": 20}\nprofile[\"occupation\"] = \"student\"\ndel profile[\"name\"]\nprint(profile[\"occupation\"])",options:["Amy","20","student","Error"],correct:2,explain:"The occupation entry is added and is unaffected when the name entry is deleted, so student is printed."},
+      {type:"programming",topic:"type conversion",prompt:"What does this code print?\ntext = \"7.99\"\nvalue = int(float(text))\nprint(value)",options:["7","7.99","8","Python raises ValueError"],correct:0,explain:"float('7.99') creates 7.99, then int() drops the fractional part toward zero and returns 7."},
+      {type:"programming",topic:"review: random ranges",prompt:"After import random, which set lists every possible result of random.randrange(1, 5)?",options:["{0, 1, 2, 3, 4}","{1, 2, 3, 4}","{1, 2, 3, 4, 5}","Any float from 1 through 5"],correct:1,explain:"randrange includes the start value 1 and excludes the stop value 5, so the possible integers are 1 through 4."},
+      {type:"logic",topic:"collection properties",prompt:"Which comparison is correct?",options:["Lists and tuples are both mutable","Sets preserve duplicates and support positional indexing","Lists are ordered and mutable, while tuples are ordered and immutable","Dictionaries are accessed only by numeric position"],correct:2,explain:"Lists and tuples are both ordered sequences, but list elements can be changed while tuple elements cannot."},
+      {type:"logic",topic:"empty containers",prompt:"Which pair correctly creates an empty dictionary and an empty set?",options:["{} and set()","set() and {}","[] and ()","dict() and {}"],correct:0,explain:"{} is an empty dictionary. set() is required for an empty set because empty braces already denote a dictionary."},
+      {type:"logic",topic:"dictionary keys",prompt:"Which value can be used as a dictionary key because it is immutable?",options:["[1, 2]","{1, 2}","(1, 2)","{\"x\": 1}"],correct:2,explain:"A tuple whose contents are immutable can be a dictionary key. Lists, sets, and dictionaries are mutable and cannot be keys."},
+      {type:"logic",topic:"removal methods",prompt:"What is the key difference between set.remove(value) and set.discard(value) when value is absent?",options:["remove() raises KeyError, while discard() does nothing","discard() raises KeyError, while remove() does nothing","Both always raise KeyError","Both remove an arbitrary element"],correct:0,explain:"Both target a value, but only remove() raises KeyError when that value is not present."},
+      {type:"logic",topic:"implicit conversion",prompt:"Why does 1 + 2.0 produce a float result?",options:["Python converts the integer operand to a compatible float representation for the operation","All arithmetic results are strings","The decimal point is ignored","float values are automatically truncated to integers"],correct:0,explain:"Mixed integer and floating-point arithmetic uses an implicit numeric conversion, so the result is the float 3.0."}
+    ]
   }
 ];
 
@@ -334,7 +415,7 @@ function renderStudyTabs(){
   MODULES.forEach((m, i) => {
     const btn = document.createElement('button');
     btn.className = 'study-tab' + (m.id === currentStudyModule.id ? ' active' : '');
-    btn.textContent = `Module ${i + 1}: ${m.title}`;
+    btn.textContent = `Week ${i + 1}: ${m.title}`;
     btn.addEventListener('click', () => {
       currentStudyModule = m;
       renderStudyTabs();
@@ -366,7 +447,7 @@ function openModule(m){
   currentModule = m;
   answers = new Array(m.questions.length).fill(null);
   graded = false;
-  quizTitle.textContent = m.title;
+  quizTitle.textContent = `Week ${MODULES.indexOf(m) + 1}: ${m.title}`;
   scoreLine.classList.remove('show');
   gradeBtn.disabled = true;
   gradeHint.textContent = 'Answer all questions to unlock grading and explanations.';
