@@ -401,6 +401,457 @@ const MODULES = [
       {type:"logic",topic:"indentation",prompt:"What defines a Python code block after an if statement?",options:["Matching braces around the statements","A semicolon after every statement","A consistent increased indentation level","Quotation marks around the block"],correct:2,explain:"Python groups block statements by indentation. Lines in the same block use the same consistent indentation level."},
       {type:"logic",topic:"floating-point comparison",prompt:"Why should programs be cautious about testing computed floating-point values with ==?",options:["Floats cannot be compared at all","Many decimal values are represented approximately, so results may differ by a tiny amount","== converts every float to a string","Float comparisons always raise TypeError"],correct:1,explain:"Binary floating-point cannot represent every decimal value exactly, so a computed result may be extremely close to, but not exactly equal to, the expected value."}
     ]
+  },
+  {
+    "id": "w5",
+    "title": "Loop",
+    "sub": "While loops, counting, for loops, range, nested loops, break, continue, loop else, and enumerate",
+    "concepts": [
+      {
+        "title": "Loop",
+        "text": "A loop repeatedly executes the loop body while its expression is True. When the expression becomes False, execution continues after the loop."
+      },
+      {
+        "title": "Iteration",
+        "text": "Each pass through a loop body is called an iteration."
+      },
+      {
+        "title": "While loop",
+        "text": "A while loop repeats an indented block as long as its loop expression evaluates to True. The condition is checked again after each iteration."
+      },
+      {
+        "title": "Loop condition",
+        "text": "A while loop starts an iteration only when its condition is True. If the condition is False before the first iteration, the loop body does not execute."
+      },
+      {
+        "title": "Sentinel value",
+        "text": "A sentinel value is a value that causes a loop to end. A common pattern reads input until the sentinel appears."
+      },
+      {
+        "title": "Infinite loop",
+        "text": "An infinite loop occurs when the loop condition never becomes False. A missing or ineffective update can cause this problem."
+      },
+      {
+        "title": "Loop variable",
+        "text": "A loop variable can track how many iterations have occurred. It must usually be updated inside a while loop."
+      },
+      {
+        "title": "Counting with while",
+        "text": "To repeat a while loop a known number of times, initialize a counter, test it in the condition, and update it during each iteration."
+      },
+      {
+        "title": "For loop",
+        "text": "A for loop processes each element in a container one at a time, assigning the next element to a loop variable."
+      },
+      {
+        "title": "Containers in for loops",
+        "text": "Lists and strings are common containers for for loops. Each iteration gives the loop variable the next element."
+      },
+      {
+        "title": "range(stop)",
+        "text": "range(Y) produces non-negative integers from 0 up to, but not including, Y."
+      },
+      {
+        "title": "range(start, stop)",
+        "text": "range(X, Y) produces integers starting at X and ending before Y."
+      },
+      {
+        "title": "range(start, stop, step)",
+        "text": "The third range() argument controls the step. A positive step moves upward and a negative step moves downward."
+      },
+      {
+        "title": "Reversed iteration",
+        "text": "reversed() can be used with a for loop to process a sequence from the last element to the first."
+      },
+      {
+        "title": "While versus for",
+        "text": "A for loop is generally a good choice when the number of iterations is known. A while loop is useful when repetition depends on input or another changing condition."
+      },
+      {
+        "title": "Nested loops",
+        "text": "A nested loop is a loop inside another loop. The outer loop runs its body, and the inner loop completes its iterations for each outer-loop iteration."
+      },
+      {
+        "title": "break",
+        "text": "A break statement exits the current loop immediately. Statements later in that loop body are skipped."
+      },
+      {
+        "title": "continue",
+        "text": "A continue statement skips the rest of the current iteration and jumps back to the loop header for the next check or item."
+      },
+      {
+        "title": "Loop else",
+        "text": "A loop else clause runs only when the loop ends normally. It does not run when the loop exits through break."
+      },
+      {
+        "title": "enumerate()",
+        "text": "enumerate() provides both the current index and the corresponding element value during iteration."
+      }
+    ],
+    "examples": [
+      {
+        "title": "Example 1: A basic while loop",
+        "code": "x = 3\nwhile x >= 1:\n    print(x)\n    x = x - 1",
+        "text": "The loop prints 3, 2, and 1. After x becomes 0, x >= 1 is False and the loop ends."
+      },
+      {
+        "title": "Example 2: Counting upward",
+        "code": "number = 1\nwhile number <= 5:\n    print(number)\n    number = number + 1",
+        "text": "The values 1 through 5 are printed. The update makes the condition eventually become False."
+      },
+      {
+        "title": "Example 3: Subtracting in a loop",
+        "code": "x = 5\ny = 18\nwhile y >= x:\n    print(y, end=' ')\n    y = y - x",
+        "text": "The output is 18 13 8. After y becomes 3, the condition 3 >= 5 is False."
+      },
+      {
+        "title": "Example 4: Counting negative inputs",
+        "code": "count = 0\nval = int(input())\nwhile val != 0:\n    if val < 0:\n        count += 1\n    val = int(input())\nprint(count)",
+        "text": "The loop continues until the sentinel 0 is entered. Only negative values increase count."
+      },
+      {
+        "title": "Example 5: Tracking a maximum",
+        "code": "max_value = -1\nval = int(input())\nwhile val != 0:\n    if val > max_value:\n        max_value = val\n    val = int(input())\nprint(max_value)",
+        "text": "Whenever the current positive input is larger than the maximum seen so far, max_value is updated."
+      },
+      {
+        "title": "Example 6: Building text until a sentinel",
+        "code": "x = int(input())\nresult = ''\nwhile x != 0:\n    result += str(x)\n    x = int(input())\nresult += 'Done'\nprint(result)",
+        "text": "If the inputs are 1, 1, and 0, the loop appends the two 1 values and then stops, producing 11Done."
+      },
+      {
+        "title": "Example 7: Sentinel password",
+        "code": "password = 'star'\nuser_input = input('Enter the password: ')\nwhile user_input != password:\n    user_input = input('Try again: ')\nprint('Access granted.')",
+        "text": "The sentinel value is star. The loop continues while the entered value is different from the password."
+      },
+      {
+        "title": "Example 8: Infinite loop from no update",
+        "code": "i = 1\nwhile i < 2:\n    print(i)",
+        "text": "i remains 1, so i < 2 stays True. The loop keeps printing 1."
+      },
+      {
+        "title": "Example 9: Infinite loop from increasing positive values",
+        "code": "score = 1\nwhile score > 0:\n    score = score + 5\n    print(score)",
+        "text": "score keeps increasing and therefore remains positive, so the condition never becomes False."
+      },
+      {
+        "title": "Example 10: A finite doubling loop",
+        "code": "score = 1\nwhile score < 10:\n    score = score * 2\n    print(score)",
+        "text": "The output is 2, 4, 8, 16. The next condition check is 16 < 10, which is False."
+      },
+      {
+        "title": "Example 11: Counting iterations",
+        "code": "count = 1\nwhile count < 10:\n    print(count)\n    count = count + 1",
+        "text": "The loop runs for count values 1 through 9, so the body executes 9 times."
+      },
+      {
+        "title": "Example 12: Count from zero",
+        "code": "count = 0\nwhile count < 50:\n    count = count + 1",
+        "text": "The condition is True for starting count values 0 through 49, so the loop body runs 50 times."
+      },
+      {
+        "title": "Example 13: A for loop over a list",
+        "code": "for name in ['Bill', 'Nicole', 'John']:\n    print(f'Hi {name}!')",
+        "text": "The loop processes each list element once and prints a greeting for Bill, Nicole, and John."
+      },
+      {
+        "title": "Example 14: Filtering inside a for loop",
+        "code": "my_list = ['abc', 'bcd', 'acd', 'ade']\nresult = ''\nfor element in my_list:\n    if element[0] == 'a':\n        result += element[-1]\nprint(result)",
+        "text": "Only strings beginning with a contribute their final character, so the result is cde."
+      },
+      {
+        "title": "Example 15: Iterating through dictionary items",
+        "code": "my_dict = {'apple': 3, 'banana': 5, 'avocado': 2, 'orange': 4}\nresult = 0\nfor key, value in my_dict.items():\n    if key[0] == 'a':\n        result += value\nprint(result)",
+        "text": "apple and avocado start with a, so their values 3 and 2 are added. The output is 5."
+      },
+      {
+        "title": "Example 16: reversed()",
+        "code": "names = ['Biffle', 'Bowyer', 'Busch', 'Gordon', 'Patrick']\nfor name in reversed(names):\n    print(name, end=' ')",
+        "text": "The names are processed from the last element to the first."
+      },
+      {
+        "title": "Example 17: range(5)",
+        "code": "for i in range(5):\n    print(i)",
+        "text": "range(5) gives 0, 1, 2, 3, and 4. The stop value 5 is not included."
+      },
+      {
+        "title": "Example 18: range with a step",
+        "code": "for i in range(2, 10, 2):\n    print(i)",
+        "text": "The loop prints 2, 4, 6, and 8. The start is included, the stop is excluded, and the step is 2."
+      },
+      {
+        "title": "Example 19: Nested loops",
+        "code": "count = 0\nfor i in range(5):\n    for j in range(4, 6):\n        count = count + 1\nprint(count)",
+        "text": "The outer loop runs 5 times and the inner loop runs 2 times for each outer iteration, so count becomes 10."
+      },
+      {
+        "title": "Example 20: break, continue, and enumerate",
+        "code": "fruits = ['apple', 'banana', 'orange']\nfor index, fruit in enumerate(fruits):\n    if fruit == 'banana':\n        continue\n    print(index, fruit)",
+        "text": "enumerate() provides both index and value. continue skips the banana iteration, so apple and orange are printed with their original indices."
+      }
+    ],
+    "questions": [
+      {
+        "type": "programming",
+        "topic": "while loop",
+        "prompt": "What does this code print?\nx = 3\nwhile x >= 1:\n    print(x, end=' ')\n    x = x - 1",
+        "options": [
+          "3 2 1",
+          "3 2 1 0",
+          "2 1 0",
+          "Infinite loop"
+        ],
+        "correct": 0,
+        "explain": "The loop runs while x is at least 1. It prints 3, 2, and 1, then x becomes 0 and the condition is False."
+      },
+      {
+        "type": "programming",
+        "topic": "while loop",
+        "prompt": "How many times does the loop body execute?\nnumber = 1\nwhile number <= 5:\n    number = number + 1",
+        "options": [
+          "4",
+          "5",
+          "6",
+          "Infinite loop"
+        ],
+        "correct": 1,
+        "explain": "The body starts with number values 1, 2, 3, 4, and 5, so it executes 5 times."
+      },
+      {
+        "type": "programming",
+        "topic": "while output",
+        "prompt": "What does this code print?\nx = 5\ny = 18\nwhile y >= x:\n    print(y, end=' ')\n    y = y - x",
+        "options": [
+          "18 13 8",
+          "18 13 8 3",
+          "18 12 6",
+          "13 8 3"
+        ],
+        "correct": 0,
+        "explain": "The printed values are 18, 13, and 8. After subtracting again, y is 3 and 3 >= 5 is False."
+      },
+      {
+        "type": "programming",
+        "topic": "sentinel",
+        "prompt": "For this code, which input sequence produces 11Done?\nx = int(input())\nresult = ''\nwhile x != 0:\n    result += str(x)\n    x = int(input())\nresult += 'Done'\nprint(result)",
+        "options": [
+          "1, 1, 0",
+          "1, 0, 1",
+          "0, 1, 1",
+          "11, 0, 0"
+        ],
+        "correct": 0,
+        "explain": "The two 1 values are appended while x is nonzero. The input 0 then stops the loop before it is appended."
+      },
+      {
+        "type": "programming",
+        "topic": "infinite loop",
+        "prompt": "What happens here?\ni = 1\nwhile i < 2:\n    print(i)",
+        "options": [
+          "It prints 1 once",
+          "It prints 1 twice",
+          "It keeps printing 1",
+          "It raises an error"
+        ],
+        "correct": 2,
+        "explain": "i is never updated, so i < 2 remains True and the loop does not end."
+      },
+      {
+        "type": "programming",
+        "topic": "counting",
+        "prompt": "How many times does the loop body execute?\ncount = 0\nwhile count < 50:\n    count = count + 1",
+        "options": [
+          "49",
+          "50",
+          "51",
+          "Infinite loop"
+        ],
+        "correct": 1,
+        "explain": "The loop starts with count values 0 through 49, giving 50 iterations."
+      },
+      {
+        "type": "programming",
+        "topic": "for loop",
+        "prompt": "What does this code print?\nresult = ''\nfor element in ['abc', 'bcd', 'acd', 'ade']:\n    if element[0] == 'a':\n        result += element[-1]\nprint(result)",
+        "options": [
+          "abc",
+          "cde",
+          "ade",
+          "cd"
+        ],
+        "correct": 1,
+        "explain": "The matching strings are abc, acd, and ade. Their last characters are c, d, and e, so result becomes cde."
+      },
+      {
+        "type": "programming",
+        "topic": "dictionary loop",
+        "prompt": "What does this code print?\nmy_dict = {'apple': 3, 'banana': 5, 'avocado': 2, 'orange': 4}\nresult = 0\nfor key, value in my_dict.items():\n    if key[0] == 'a':\n        result += value\nprint(result)",
+        "options": [
+          "2",
+          "3",
+          "5",
+          "14"
+        ],
+        "correct": 2,
+        "explain": "apple contributes 3 and avocado contributes 2. The total is 5."
+      },
+      {
+        "type": "programming",
+        "topic": "range",
+        "prompt": "What does this code print?\nfor i in range(5):\n    print(i, end=' ')",
+        "options": [
+          "0 1 2 3 4",
+          "1 2 3 4 5",
+          "0 1 2 3 4 5",
+          "1 2 3 4"
+        ],
+        "correct": 0,
+        "explain": "range(5) starts at 0 and stops before 5."
+      },
+      {
+        "type": "programming",
+        "topic": "range step",
+        "prompt": "What does this code print?\nfor i in range(2, 10, 2):\n    print(i, end=' ')",
+        "options": [
+          "2 4 6 8",
+          "2 4 6 8 10",
+          "0 2 4 6 8",
+          "2 3 4 5 6 7 8 9"
+        ],
+        "correct": 0,
+        "explain": "The start value 2 is included, the stop value 10 is excluded, and the step is 2."
+      },
+      {
+        "type": "programming",
+        "topic": "range and index",
+        "prompt": "What does this code print?\nmy_list = [1, 0, -2, 3, -4, 5, 6]\nfor x in range(len(my_list)):\n    if my_list[x] > 0:\n        print(x, end=' ')",
+        "options": [
+          "1 3 5 6",
+          "0 3 5 6",
+          "0 1 3 5 6",
+          "1 3 5"
+        ],
+        "correct": 1,
+        "explain": "Positive values occur at indices 0, 3, 5, and 6."
+      },
+      {
+        "type": "programming",
+        "topic": "nested loops",
+        "prompt": "What is printed?\ncount = 0\nfor i in range(5):\n    for j in range(4, 6):\n        count = count + 1\nprint(count)",
+        "options": [
+          "5",
+          "7",
+          "10",
+          "20"
+        ],
+        "correct": 2,
+        "explain": "The outer loop runs 5 times and the inner loop runs 2 times per outer iteration, so count increases 10 times."
+      },
+      {
+        "type": "programming",
+        "topic": "break",
+        "prompt": "What does this code print?\nfor x in range(5):\n    if x == 2:\n        break\n    print(x, end=' ')",
+        "options": [
+          "0 1",
+          "0 1 2",
+          "0 1 3 4",
+          "2"
+        ],
+        "correct": 0,
+        "explain": "break exits the loop when x is 2, before print(x) runs for that iteration."
+      },
+      {
+        "type": "programming",
+        "topic": "continue",
+        "prompt": "What does this code print?\nfor x in range(5):\n    if x == 2:\n        continue\n    print(x, end=' ')",
+        "options": [
+          "0 1",
+          "0 1 2 3 4",
+          "0 1 3 4",
+          "2 3 4"
+        ],
+        "correct": 2,
+        "explain": "continue skips only the iteration where x is 2. The loop then continues with 3 and 4."
+      },
+      {
+        "type": "programming",
+        "topic": "break and continue",
+        "prompt": "What does this code print?\ni = 0\nwhile i < 10:\n    i += 1\n    if i % 3 == 0:\n        continue\n    if i == 8:\n        break\n    print(i, end=' ')",
+        "options": [
+          "1 2 4 5 7",
+          "1 2 4 5 7 8",
+          "1 2 3 4 5 6 7",
+          "1 2 4 5 7 9 10"
+        ],
+        "correct": 0,
+        "explain": "3 and 6 are skipped by continue. When i becomes 8, break exits before printing 8."
+      },
+      {
+        "type": "logic",
+        "topic": "loop definition",
+        "prompt": "What is an iteration?",
+        "options": [
+          "The condition that starts a loop",
+          "One pass through the loop body",
+          "A value that always stops a loop",
+          "A function used only with for loops"
+        ],
+        "correct": 1,
+        "explain": "Each time the loop body executes is one iteration."
+      },
+      {
+        "type": "logic",
+        "topic": "while versus for",
+        "prompt": "Which situation is generally better suited to a while loop?",
+        "options": [
+          "Repeating exactly 10 times",
+          "Processing every item in a fixed list",
+          "Repeating until a user enters a sentinel value",
+          "Looping over range(5)"
+        ],
+        "correct": 2,
+        "explain": "The number of repetitions is not known in advance because it depends on when the sentinel input appears."
+      },
+      {
+        "type": "logic",
+        "topic": "sentinel",
+        "prompt": "What is a sentinel value?",
+        "options": [
+          "A value that causes a loop to end",
+          "A counter that must begin at 0",
+          "The first element in a list",
+          "A value produced by enumerate()"
+        ],
+        "correct": 0,
+        "explain": "A sentinel value signals that the repetition should stop."
+      },
+      {
+        "type": "logic",
+        "topic": "loop else",
+        "prompt": "When does a loop's else clause execute?",
+        "options": [
+          "Only after break",
+          "Only when the loop terminates normally without break",
+          "At the beginning of every iteration",
+          "Only for infinite loops"
+        ],
+        "correct": 1,
+        "explain": "The loop else clause executes when the loop finishes normally and is skipped when break exits the loop."
+      },
+      {
+        "type": "logic",
+        "topic": "enumerate",
+        "prompt": "Why is enumerate() useful in a for loop?",
+        "options": [
+          "It stops an infinite loop",
+          "It provides both the current index and element value",
+          "It reverses the sequence",
+          "It removes duplicate values"
+        ],
+        "correct": 1,
+        "explain": "enumerate() yields an index and its corresponding value together for each iteration."
+      }
+    ]
   }
 ];
 
