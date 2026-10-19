@@ -4,186 +4,51 @@ const WEEK7 = {
   "sub": "Indexing, slicing, formatting, string methods, transformation, split, and join",
   "concepts": [
     {
-      "title": "Strings and string literals",
-      "text": "A string is a sequence of characters. Text inside single or double quotation marks is a string literal."
+      "title": "Indexing",
+      "text": "Strings are sequences. Positive indexes start at 0 from the left, and negative indexes start at -1 from the right."
     },
     {
-      "title": "Positive indexing",
-      "text": "Indexes from the left start at 0."
+      "title": "Slicing and immutability",
+      "text": "text[start:stop:stride] creates a new string. The stop index is excluded, and the original string is not changed."
     },
     {
-      "title": "Negative indexing",
-      "text": "Indexes from the right start at -1 for the final character."
+      "title": "String formatting",
+      "text": "Field width controls minimum display width. Use < for left, > for right, ^ for center, and an optional fill character before the alignment symbol."
     },
     {
-      "title": "Single-character access",
-      "text": "One index retrieves the character at that position."
+      "title": "String methods",
+      "text": "replace(), find(), rfind(), and count() help search and modify text. String checks and transformations include isdigit(), isupper(), lower(), strip(), and related methods."
     },
     {
-      "title": "Basic slicing",
-      "text": "text[start:stop] includes start and stops before stop."
-    },
-    {
-      "title": "Omitting the start",
-      "text": "text[:stop] begins at the first character."
-    },
-    {
-      "title": "Omitting the stop",
-      "text": "text[start:] continues through the final character."
-    },
-    {
-      "title": "Full slice",
-      "text": "text[:] contains the entire string."
-    },
-    {
-      "title": "Slice stride",
-      "text": "text[start:stop:stride] uses stride to control the index increment. The default stride is 1."
-    },
-    {
-      "title": "String immutability",
-      "text": "Strings cannot be changed in place. A slice is a new string object."
-    },
-    {
-      "title": "Reassignment and slices",
-      "text": "Reassigning the original variable does not change a slice that was already created."
-    },
-    {
-      "title": "Field width",
-      "text": "A format width sets the minimum number of character positions used to display a value."
-    },
-    {
-      "title": "Left alignment",
-      "text": "< left-aligns a value within the field width."
-    },
-    {
-      "title": "Right alignment",
-      "text": "> right-aligns a value within the field width."
-    },
-    {
-      "title": "Center alignment",
-      "text": "^ centers a value within the field width."
-    },
-    {
-      "title": "Fill characters",
-      "text": "A character before the alignment symbol fills unused field positions."
-    },
-    {
-      "title": "replace()",
-      "text": "replace(old, new) creates a copy with matching substrings replaced. A count argument limits replacements."
-    },
-    {
-      "title": "find(), rfind(), count()",
-      "text": "find() locates the first match, rfind() the last match, and count() counts occurrences."
-    },
-    {
-      "title": "Checks and transformations",
-      "text": "isdigit(), isupper(), and islower() check text. lower(), upper(), strip(), and title() transform text."
-    },
-    {
-      "title": "split() and join()",
-      "text": "split() breaks a string into tokens. join() combines strings using a separator."
+      "title": "Split and join",
+      "text": "split() breaks a string into a list of tokens. join() creates a new string by placing a separator between strings."
     }
   ],
   "examples": [
     {
-      "title": "Example 1: Positive indexing",
-      "code": "text = 'Hello'\nprint(text[1])",
-      "text": "Index 1 is e."
+      "title": "Example 1: Indexing and slicing",
+      "code": "text = 'Hello World'\nprint(text[1])\nprint(text[1:5])",
+      "text": "Index 1 is e. The slice from 1 to 5 stops before index 5, so it prints ello."
     },
     {
-      "title": "Example 2: Negative indexing",
-      "code": "text = 'Hello'\nprint(text[-1])",
-      "text": "Index -1 is o."
+      "title": "Example 2: Stride and immutability",
+      "code": "text = 'abcdefghij'\npiece = text[0:10:2]\ntext = 'xyz'\nprint(piece)",
+      "text": "The slice selects indices 0, 2, 4, 6, and 8, producing acegi. Reassigning text later does not change piece."
     },
     {
-      "title": "Example 3: Basic slicing",
-      "code": "text = 'Python'\nprint(text[1:4])",
-      "text": "The output is yth."
-    },
-    {
-      "title": "Example 4: Omitted start",
-      "code": "text = 'en.wikipedia'\nprint(text[:5])",
-      "text": "The output is en.wi."
-    },
-    {
-      "title": "Example 5: Omitted stop",
-      "code": "text = 'en.wikipedia'\nprint(text[2:])",
-      "text": "The output is .wikipedia."
-    },
-    {
-      "title": "Example 6: Full slice",
-      "code": "text = 'en.wikipedia'\nprint(text[:])",
-      "text": "The full string is displayed."
-    },
-    {
-      "title": "Example 7: Stride",
-      "code": "text = 'abcdefghij'\nprint(text[0:10:2])",
-      "text": "The output is acegi."
-    },
-    {
-      "title": "Example 8: Combining slices",
-      "code": "a = 'Google'\nb = 'Wikipedia'\nprint(a[3:-1] + b[1:-3:2])",
-      "text": "The slices are gl and iie, so the output is gliie."
-    },
-    {
-      "title": "Example 9: Slice immutability",
-      "code": "original = 'Hello World'\npiece = original[1:-3]\noriginal = 'Hi World'\nprint(piece)",
-      "text": "piece remains ello Wo."
-    },
-    {
-      "title": "Example 10: Field width",
-      "code": "name = 'Bob'\nprint(f'|{name:8}|')",
-      "text": "Bob is displayed in a minimum field width of 8."
-    },
-    {
-      "title": "Example 11: Left alignment",
-      "code": "word = 'Hi'\nprint(f'|{word:<6}|')",
-      "text": "Padding is added to the right."
-    },
-    {
-      "title": "Example 12: Right alignment",
-      "code": "word = 'Hi'\nprint(f'|{word:>6}|')",
-      "text": "Padding is added to the left."
-    },
-    {
-      "title": "Example 13: Center alignment",
-      "code": "word = 'Hi'\nprint(f'|{word:^6}|')",
-      "text": "The value is centered."
-    },
-    {
-      "title": "Example 14: Custom fill",
+      "title": "Example 3: Width, alignment, and fill",
       "code": "symbol = '@'\nprint(f'{symbol:*^11}')",
-      "text": "The output is *****@*****."
+      "text": "The @ is centered in width 11 and the unused positions are filled with *, producing *****@*****."
     },
     {
-      "title": "Example 15: replace()",
-      "code": "text = 'cat cat dog'\nprint(text.replace('cat','fox'))",
-      "text": "The output is fox fox dog."
+      "title": "Example 4: Find, replace, and count",
+      "code": "s = 'Python is fun, Python is powerful.'\nnew_s = s.replace('Python', 'Java', 1)\nprint(new_s.find('Python'))\nprint(new_s.count('Python'))",
+      "text": "Only the first Python is replaced. The remaining Python can still be found and counted."
     },
     {
-      "title": "Example 16: Limited replace",
-      "code": "s = 'Python is fun, Python is powerful. But I like Python.'\nnew_s = s.replace('Python','Java',1)\nprint(new_s.count('Python'))",
-      "text": "Two occurrences of Python remain."
-    },
-    {
-      "title": "Example 17: find and rfind",
-      "code": "text = 'banana'\nprint(text.find('an'))\nprint(text.rfind('an'))",
-      "text": "The outputs are 1 and 3."
-    },
-    {
-      "title": "Example 18: Text cleanup",
-      "code": "name = '  BOB  '\nprint(name.strip().lower())",
-      "text": "The output is bob."
-    },
-    {
-      "title": "Example 19: split()",
-      "code": "text = 'Hello   World'\nprint(text.split(' '))\nprint(text.split())",
-      "text": "An explicit space can preserve empty tokens; split() ignores extra whitespace."
-    },
-    {
-      "title": "Example 20: join()",
-      "code": "parts = ['caius','palomo']\nprint(' '.join(parts))",
-      "text": "The output is caius palomo."
+      "title": "Example 5: Split and join",
+      "code": "email = 'caius.palomo@mail.mcgill.ca'\nname = email.split('@')[0]\nparts = name.split('.')\nprint(' '.join(parts))",
+      "text": "The email is split to isolate caius.palomo, then split again at the period and joined with a space to produce caius palomo."
     }
   ],
   "questions": [
