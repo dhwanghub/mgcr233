@@ -46,6 +46,18 @@
   .info-item .v{font-size:14px;font-weight:500;}
   .info-item .v a{color:var(--red);text-decoration:none;}
   .info-item .v a:hover{text-decoration:underline;}
+  .practice-cheer{margin-top:2px;padding-top:2px;}
+  .practice-cheer .cheer-label{font-size:12px;color:var(--gray-light);margin-bottom:7px;}
+  .cheer-row{display:flex;align-items:center;gap:8px;min-height:30px;}
+  .heart-btn{position:relative;width:30px;height:30px;border:1px solid var(--line);border-radius:50%;background:var(--paper);color:var(--red);font-size:17px;line-height:1;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:transform .15s ease,border-color .15s ease,background .15s ease;}
+  .heart-btn:hover{border-color:var(--red);background:var(--soft-red);transform:translateY(-1px);}
+  .heart-btn.celebrate{animation:heartPop .48s ease;}
+  .heart-btn.celebrate::after{content:'✦';position:absolute;right:-7px;top:-8px;font-size:12px;color:var(--red);animation:sparkPop .55s ease forwards;}
+  .achievement{font-size:11.5px;font-weight:700;color:var(--correct-line);opacity:0;transform:translateY(2px);transition:opacity .18s ease,transform .18s ease;}
+  .achievement.show{opacity:1;transform:translateY(0);}
+  .visit-note{font-size:11.5px;color:var(--gray-light);margin-top:6px;min-height:18px;}
+  @keyframes heartPop{0%{transform:scale(1)}35%{transform:scale(1.3)}70%{transform:scale(.94)}100%{transform:scale(1)}}
+  @keyframes sparkPop{0%{opacity:0;transform:scale(.5) translateY(2px)}40%{opacity:1}100%{opacity:0;transform:scale(1.25) translateY(-8px)}}
 
   .study{padding:36px 0 16px;}
   .study-head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;margin-bottom:18px;}
@@ -116,6 +128,7 @@
 
   .grade-bar{margin-top:36px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;padding-top:6px;}
   .grade-bar .hint{font-size:13px;color:var(--gray);max-width:520px;}
+  .grade-bar .btn{display:none;}
   .btn{font-size:14px;font-weight:600;padding:12px 22px;border-radius:4px;border:1px solid var(--red);background:var(--red);color:#fff;cursor:pointer;transition:background .15s ease,opacity .15s ease;}
   .btn:hover:not(:disabled){background:var(--red-dark);border-color:var(--red-dark);}
   .btn:disabled{cursor:not-allowed;opacity:.38;background:var(--red);}
@@ -156,6 +169,14 @@
         <div class="info-support">
           <div class="info-item"><div class="k">Need help?</div><div class="v"><a href="mailto:dugmee.hwang@mcgill.ca">dugmee.hwang@mcgill.ca</a></div></div>
           <div class="info-item"><div class="k">Discussion needed?</div><div class="v"><a href="https://mycourses2.mcgill.ca/d2l/le/879465/discussions/List" target="_blank" rel="noopener noreferrer">myCourses Discussion Board</a></div></div>
+          <div class="practice-cheer">
+            <div class="cheer-label">Have you solved a problem? Tap the heart.</div>
+            <div class="cheer-row">
+              <button class="heart-btn" id="heart-btn" type="button" aria-label="Celebrate a solved problem">♥</button>
+              <span class="achievement" id="achievement">★ Nice work!</span>
+            </div>
+            <div class="visit-note" id="visit-note">Keep going. Every practice session counts.</div>
+          </div>
         </div>
       </div>
     </section>
@@ -191,12 +212,12 @@
     <button class="back-link" id="back-btn">&larr; Back to main page</button>
     <div class="quiz-header">
       <h2 id="quiz-title"></h2>
-      <p>Answer all 20 questions before grading. Solutions remain hidden until the full set is complete.</p>
+      <p>Choose one answer for each question. Correctness and explanation appear immediately after you answer.</p>
     </div>
     <div class="quiz-progress" id="quiz-progress"></div>
     <div id="quiz-root"></div>
     <div class="grade-bar">
-      <div class="hint" id="grade-hint">Answer all questions to unlock grading and explanations.</div>
+      <div class="hint" id="grade-hint">Choose an answer to see feedback immediately.</div>
       <button class="btn" id="grade-btn" disabled>Submit answers</button>
     </div>
     <div class="score-line" id="score-line">
@@ -211,10 +232,10 @@
 <script>
 const MODULES = [
   {
-    id: "w1",
-    title: "Introduction to Python",
-    sub: "Programming basics, statements, output, and common errors",
-    concepts: [
+    "id": "w1",
+    "title": "Introduction to Python",
+    "sub": "Programming basics, statements, output, and common errors",
+    "concepts": [
       {
         "title": "Input, Process, Output",
         "text": "A simple program often receives input, performs a process, and produces output. Variables let the program refer to values while those steps happen."
@@ -236,7 +257,7 @@ const MODULES = [
         "text": "Syntax and indentation errors prevent code from running correctly; runtime exceptions occur during execution. Logic errors are different because the program runs but produces the wrong result."
       }
     ],
-    examples: [
+    "examples": [
       {
         "title": "Example 1: Assignment and output",
         "code": "price = 8\nquantity = 3\ntotal = price * quantity\nprint(total)",
@@ -263,34 +284,274 @@ const MODULES = [
         "text": "The code is syntactically valid, but division by zero raises ZeroDivisionError when the final line is executed."
       }
     ],
-    questions: [
-      {type:"programming",topic:"output",prompt:"What does this code print?\nx = 4\ny = 3\nprint(x + y)",options:["7","43","x + y","Error"],correct:0,explain:"x is 4 and y is 3, so x + y evaluates to 7 and print() displays 7."},
-      {type:"programming",topic:"assignment",prompt:"What is the final value of total?\nprice = 5\nquantity = 4\ntotal = price * quantity",options:["9","20","54","Error"],correct:1,explain:"price * quantity evaluates to 5 * 4, so total is assigned 20."},
-      {type:"programming",topic:"reassignment",prompt:"What does this code print?\nx = 10\nx = x + 5\nprint(x)",options:["10","15","105","Error"],correct:1,explain:"The expression x + 5 uses the current value 10. The result 15 is then assigned back to x."},
-      {type:"programming",topic:"reassignment",prompt:"What does this code print?\na = 2\nb = a\na = 7\nprint(b)",options:["2","7","9","Error"],correct:0,explain:"b is assigned the value referred to by a at that time, which is 2. Reassigning a later does not change b."},
-      {type:"programming",topic:"print",prompt:"Which line correctly displays the value stored in score?",options:["display(score)","print(score)","output = score","score.print()"],correct:1,explain:"print(score) passes the current value of score to Python's print() function."},
-      {type:"programming",topic:"equality",prompt:"What does this code print?\nx = 5\nprint(x == 5)",options:["5","True","False","Error"],correct:1,explain:"== compares values. Since x currently refers to 5, x == 5 evaluates to True."},
-      {type:"programming",topic:"comparison",prompt:"What does this code print?\nx = 10\nprint(x < 10)",options:["True","False","10","Error"],correct:1,explain:"The operator < means strictly less than. Since 10 is not less than 10, the result is False."},
-      {type:"programming",topic:"comparison",prompt:"What does this code print?\nx = 10\nprint(x <= 10)",options:["True","False","10","Error"],correct:0,explain:"The operator <= includes equality. Since x equals 10, x <= 10 is True."},
-      {type:"programming",topic:"syntax error",prompt:"What happens when Python 3 runs this line?\nprint \"Hello\"",options:["It prints Hello","It raises SyntaxError","It raises NameError","It prints \"Hello\" including quotation marks"],correct:1,explain:"In Python 3, print is a function and requires parentheses around its argument. This form is invalid syntax."},
-      {type:"programming",topic:"name error",prompt:"Assume Monday has not been defined. What happens here?\nweekday = Monday",options:["weekday stores the text Monday","Python raises NameError","Python raises TypeError","weekday becomes 0"],correct:1,explain:"Without quotation marks, Python treats Monday as a name. Because that name is undefined, Python raises NameError."},
-      {type:"programming",topic:"value error",prompt:"What happens when this line is executed?\nage = int(\"twenty\")",options:["age becomes 20","age becomes 0","Python raises ValueError","Python raises SyntaxError"],correct:2,explain:"int() cannot convert the string \"twenty\" into an integer, so it raises ValueError."},
-      {type:"programming",topic:"type error",prompt:"What happens here?\nresult = 10 + \"5\"",options:["result becomes 15","result becomes \"105\"","Python raises TypeError","Python raises NameError"],correct:2,explain:"Python does not add an integer and a string with +. The incompatible operand types cause TypeError."},
-      {type:"programming",topic:"zero division",prompt:"What happens here?\nnumber = 10 / 0",options:["number becomes 0","number becomes infinity","Python raises ZeroDivisionError","Python raises SyntaxError"],correct:2,explain:"Division by zero is not defined for these numeric values, so Python raises ZeroDivisionError during execution."},
-      {type:"programming",topic:"logic error",prompt:"A store wants revenue = price * quantity. The programmer writes:\nrevenue = price + quantity\nThe code runs. What kind of problem is this?",options:["SyntaxError","NameError","Logic error","IndentationError"],correct:2,explain:"The instruction is valid Python, but it uses the wrong operation for the intended calculation. That makes it a logic error."},
-      {type:"programming",topic:"output precision",prompt:"The required output is exactly: Total: 25\nWhich line produces that text when total = 25?",options:["print(\"Total:\", total)","print(\"Total\", total)","print(total, \"Total:\")","print(\"Total:25\")"],correct:0,explain:"print(\"Total:\", total) inserts one space between its two arguments, producing exactly Total: 25."},
-      {type:"logic",topic:"program structure",prompt:"A program asks for a price, multiplies it by a quantity, then displays the total. Which sequence best describes the flow?",options:["Output, input, process","Input, process, output","Process, output, input","Variable, error, output"],correct:1,explain:"The program first receives information, then computes with it, then displays the result. That is input, process, output."},
-      {type:"logic",topic:"interpreter and script",prompt:"Why is a saved Python script usually more practical than entering a longer program line by line in the interactive interpreter?",options:["Scripts can be edited, saved, and rerun as a complete program","The interpreter cannot run Python","Scripts never contain errors","The interpreter cannot display output"],correct:0,explain:"A script keeps the program in a file, which makes it easier to edit, rerun, and share. The interpreter is still useful for quick experiments."},
-      {type:"logic",topic:"statement",prompt:"Which description best fits a Python statement?",options:["An instruction Python can execute","A value that must be numeric","Only text inside print()","A name that cannot change"],correct:0,explain:"A statement is an instruction Python executes. Statements can include assignments, function calls, and other forms."},
-      {type:"logic",topic:"expression",prompt:"Which item is an expression because it evaluates to a value?",options:["4 + 3","A comment describing the program","The name of a Python file","An error message"],correct:0,explain:"4 + 3 is an expression because Python evaluates it and obtains the value 7."},
-      {type:"logic",topic:"debugging",prompt:"Which situation can be hardest to notice immediately?",options:["A SyntaxError that stops the program","A NameError that stops the program","A logic error that produces a plausible but wrong result","An IndentationError reported by Python"],correct:2,explain:"A logic error may not produce an exception. The program can finish normally while giving an incorrect result, so the programmer must check the logic and output."}
+    "questions": [
+      {
+        "type": "programming",
+        "topic": "output",
+        "prompt": "What does this code print?\nx = 4\ny = 3\nprint(x + y)",
+        "options": [
+          "7",
+          "43",
+          "x + y",
+          "Error"
+        ],
+        "correct": 0,
+        "explain": "x is 4 and y is 3, so x + y evaluates to 7 and print() displays 7."
+      },
+      {
+        "type": "programming",
+        "topic": "assignment",
+        "prompt": "What is the final value of total?\nprice = 5\nquantity = 4\ntotal = price * quantity",
+        "options": [
+          "9",
+          "20",
+          "54",
+          "Error"
+        ],
+        "correct": 1,
+        "explain": "price * quantity evaluates to 5 * 4, so total is assigned 20."
+      },
+      {
+        "type": "programming",
+        "topic": "reassignment",
+        "prompt": "What does this code print?\nx = 10\nx = x + 5\nprint(x)",
+        "options": [
+          "10",
+          "15",
+          "105",
+          "Error"
+        ],
+        "correct": 1,
+        "explain": "The expression x + 5 uses the current value 10. The result 15 is then assigned back to x."
+      },
+      {
+        "type": "programming",
+        "topic": "reassignment",
+        "prompt": "What does this code print?\na = 2\nb = a\na = 7\nprint(b)",
+        "options": [
+          "2",
+          "7",
+          "9",
+          "Error"
+        ],
+        "correct": 0,
+        "explain": "b is assigned the value referred to by a at that time, which is 2. Reassigning a later does not change b."
+      },
+      {
+        "type": "programming",
+        "topic": "print",
+        "prompt": "Which line correctly displays the value stored in score?",
+        "options": [
+          "display(score)",
+          "print(score)",
+          "output = score",
+          "score.print()"
+        ],
+        "correct": 1,
+        "explain": "print(score) passes the current value of score to Python's print() function."
+      },
+      {
+        "type": "programming",
+        "topic": "equality",
+        "prompt": "What does this code print?\nx = 5\nprint(x == 5)",
+        "options": [
+          "5",
+          "True",
+          "False",
+          "Error"
+        ],
+        "correct": 1,
+        "explain": "== compares values. Since x currently refers to 5, x == 5 evaluates to True."
+      },
+      {
+        "type": "programming",
+        "topic": "comparison",
+        "prompt": "What does this code print?\nx = 10\nprint(x < 10)",
+        "options": [
+          "True",
+          "False",
+          "10",
+          "Error"
+        ],
+        "correct": 1,
+        "explain": "The operator < means strictly less than. Since 10 is not less than 10, the result is False."
+      },
+      {
+        "type": "programming",
+        "topic": "comparison",
+        "prompt": "What does this code print?\nx = 10\nprint(x <= 10)",
+        "options": [
+          "True",
+          "False",
+          "10",
+          "Error"
+        ],
+        "correct": 0,
+        "explain": "The operator <= includes equality. Since x equals 10, x <= 10 is True."
+      },
+      {
+        "type": "programming",
+        "topic": "syntax error",
+        "prompt": "What happens when Python 3 runs this line?\nprint \"Hello\"",
+        "options": [
+          "It prints Hello",
+          "It raises SyntaxError",
+          "It raises NameError",
+          "It prints \"Hello\" including quotation marks"
+        ],
+        "correct": 1,
+        "explain": "In Python 3, print is a function and requires parentheses around its argument. This form is invalid syntax."
+      },
+      {
+        "type": "programming",
+        "topic": "name error",
+        "prompt": "Assume Monday has not been defined. What happens here?\nweekday = Monday",
+        "options": [
+          "weekday stores the text Monday",
+          "Python raises NameError",
+          "Python raises TypeError",
+          "weekday becomes 0"
+        ],
+        "correct": 1,
+        "explain": "Without quotation marks, Python treats Monday as a name. Because that name is undefined, Python raises NameError."
+      },
+      {
+        "type": "programming",
+        "topic": "value error",
+        "prompt": "What happens when this line is executed?\nage = int(\"twenty\")",
+        "options": [
+          "age becomes 20",
+          "age becomes 0",
+          "Python raises ValueError",
+          "Python raises SyntaxError"
+        ],
+        "correct": 2,
+        "explain": "int() cannot convert the string \"twenty\" into an integer, so it raises ValueError."
+      },
+      {
+        "type": "programming",
+        "topic": "type error",
+        "prompt": "What happens here?\nresult = 10 + \"5\"",
+        "options": [
+          "result becomes 15",
+          "result becomes \"105\"",
+          "Python raises TypeError",
+          "Python raises NameError"
+        ],
+        "correct": 2,
+        "explain": "Python does not add an integer and a string with +. The incompatible operand types cause TypeError."
+      },
+      {
+        "type": "programming",
+        "topic": "zero division",
+        "prompt": "What happens here?\nnumber = 10 / 0",
+        "options": [
+          "number becomes 0",
+          "number becomes infinity",
+          "Python raises ZeroDivisionError",
+          "Python raises SyntaxError"
+        ],
+        "correct": 2,
+        "explain": "Division by zero is not defined for these numeric values, so Python raises ZeroDivisionError during execution."
+      },
+      {
+        "type": "programming",
+        "topic": "logic error",
+        "prompt": "A store wants revenue = price * quantity. The programmer writes:\nrevenue = price + quantity\nThe code runs. What kind of problem is this?",
+        "options": [
+          "SyntaxError",
+          "NameError",
+          "Logic error",
+          "IndentationError"
+        ],
+        "correct": 2,
+        "explain": "The instruction is valid Python, but it uses the wrong operation for the intended calculation. That makes it a logic error."
+      },
+      {
+        "type": "programming",
+        "topic": "output precision",
+        "prompt": "The required output is exactly: Total: 25\nWhich line produces that text when total = 25?",
+        "options": [
+          "print(\"Total:\", total)",
+          "print(\"Total\", total)",
+          "print(total, \"Total:\")",
+          "print(\"Total:25\")"
+        ],
+        "correct": 0,
+        "explain": "print(\"Total:\", total) inserts one space between its two arguments, producing exactly Total: 25."
+      },
+      {
+        "type": "logic",
+        "topic": "program structure",
+        "prompt": "A program asks for a price, multiplies it by a quantity, then displays the total. Which sequence best describes the flow?",
+        "options": [
+          "Output, input, process",
+          "Input, process, output",
+          "Process, output, input",
+          "Variable, error, output"
+        ],
+        "correct": 1,
+        "explain": "The program first receives information, then computes with it, then displays the result. That is input, process, output."
+      },
+      {
+        "type": "logic",
+        "topic": "interpreter and script",
+        "prompt": "Why is a saved Python script usually more practical than entering a longer program line by line in the interactive interpreter?",
+        "options": [
+          "Scripts can be edited, saved, and rerun as a complete program",
+          "The interpreter cannot run Python",
+          "Scripts never contain errors",
+          "The interpreter cannot display output"
+        ],
+        "correct": 0,
+        "explain": "A script keeps the program in a file, which makes it easier to edit, rerun, and share. The interpreter is still useful for quick experiments."
+      },
+      {
+        "type": "logic",
+        "topic": "statement",
+        "prompt": "Which description best fits a Python statement?",
+        "options": [
+          "An instruction Python can execute",
+          "A value that must be numeric",
+          "Only text inside print()",
+          "A name that cannot change"
+        ],
+        "correct": 0,
+        "explain": "A statement is an instruction Python executes. Statements can include assignments, function calls, and other forms."
+      },
+      {
+        "type": "logic",
+        "topic": "expression",
+        "prompt": "Which item is an expression because it evaluates to a value?",
+        "options": [
+          "4 + 3",
+          "A comment describing the program",
+          "The name of a Python file",
+          "An error message"
+        ],
+        "correct": 0,
+        "explain": "4 + 3 is an expression because Python evaluates it and obtains the value 7."
+      },
+      {
+        "type": "logic",
+        "topic": "debugging",
+        "prompt": "Which situation can be hardest to notice immediately?",
+        "options": [
+          "A SyntaxError that stops the program",
+          "A NameError that stops the program",
+          "A logic error that produces a plausible but wrong result",
+          "An IndentationError reported by Python"
+        ],
+        "correct": 2,
+        "explain": "A logic error may not produce an exception. The program can finish normally while giving an incorrect result, so the programmer must check the logic and output."
+      }
     ]
   },
   {
-    id: "w2",
-    title: "Variables and Expressions",
-    sub: "Objects, numeric types, operators, formatting, math, and random",
-    concepts: [
+    "id": "w2",
+    "title": "Variables and Expressions",
+    "sub": "Objects, numeric types, operators, formatting, math, and random",
+    "concepts": [
       {
         "title": "Variables and Objects",
         "text": "A variable is a name bound to an object. Python objects have a value, a type, and an identity."
@@ -312,7 +573,7 @@ const MODULES = [
         "text": "int() truncates a float toward zero, while round() performs rounding. Modules such as math and random provide additional numeric operations and bounded random values."
       }
     ],
-    examples: [
+    "examples": [
       {
         "title": "Example 1: Division operators",
         "code": "print(17 / 5)\nprint(17 // 5)\nprint(17 % 5)",
@@ -339,34 +600,274 @@ const MODULES = [
         "text": "math.sqrt(49) prints 7.0. randint(1, 6) assigns an integer from 1 through 6, including both endpoints."
       }
     ],
-    questions: [
-      {type:"programming",topic:"assignment",prompt:"What is the final value of x?\nx = 5\nx = x + 3\nx = x * 2",options:["8","10","16","Error"],correct:2,explain:"x becomes 8 after x = x + 3, then 16 after x = x * 2."},
-      {type:"programming",topic:"augmented assignment",prompt:"What does this code print?\nx = 10\nx += 2\nx *= 3\nprint(x)",options:["30","36","32","16"],correct:1,explain:"x += 2 changes x from 10 to 12. Then x *= 3 changes 12 to 36."},
-      {type:"programming",topic:"true division",prompt:"What does this code print?\nprint(7 / 2)",options:["3","3.0","3.5","4"],correct:2,explain:"The / operator performs true division, so 7 / 2 evaluates to the float 3.5."},
-      {type:"programming",topic:"floor division",prompt:"What does this code print?\nprint(17 // 5)",options:["3","3.4","4","2"],correct:0,explain:"17 / 5 is 3.4. Floor division // returns the greatest integer not greater than that result, which is 3."},
-      {type:"programming",topic:"modulo",prompt:"What does this code print?\nprint(17 % 5)",options:["2","3","3.4","5"],correct:0,explain:"17 can be written as 5 * 3 + 2, so 17 % 5 is 2."},
-      {type:"programming",topic:"digit extraction",prompt:"Given x = 237, which expression evaluates to the tens digit 3?",options:["x % 10","(x // 10) % 10","x // 100","x % 1000"],correct:1,explain:"x // 10 gives 23. Then 23 % 10 gives 3, the tens digit."},
-      {type:"programming",topic:"precedence",prompt:"What is the value of result?\nresult = 3 + 2 * 4",options:["20","11","14","24"],correct:1,explain:"Multiplication is evaluated before addition, so 2 * 4 is 8 and 3 + 8 is 11."},
-      {type:"programming",topic:"precedence",prompt:"Evaluate this expression:\n3 + 2 * (5 - 1) ** 2",options:["35","32","20","13"],correct:0,explain:"(5 - 1) is 4, 4 ** 2 is 16, 2 * 16 is 32, and 3 + 32 is 35."},
-      {type:"programming",topic:"float type",prompt:"What does this code print?\nx = 1\ny = 2\nz = x / y\nprint(type(z))",options:["<class 'int'>","<class 'float'>","0.5","Error"],correct:1,explain:"For numeric operands, / returns a float. Therefore z is 0.5 and type(z) is float."},
-      {type:"programming",topic:"formatting",prompt:"What does this code print?\npi = 3.14159265\nprint(f\"{pi:.3f}\")",options:["3.14","3.142","3.14159265","3"],correct:1,explain:".3f formats the value with three digits after the decimal point. For this value, the displayed result is 3.142."},
-      {type:"programming",topic:"round",prompt:"What does this expression return?\nround(4.567, 2)",options:["4.5","4.56","4.57","5"],correct:2,explain:"Rounding 4.567 to two digits after the decimal point gives 4.57."},
-      {type:"programming",topic:"int conversion",prompt:"What does this expression return?\nint(4.9)",options:["5","4","4.9","Error"],correct:1,explain:"int() truncates this positive float toward zero, so int(4.9) returns 4. It does not round to the nearest integer."},
-      {type:"programming",topic:"math module",prompt:"What does this code print?\nimport math\nprint(math.sqrt(49))",options:["7","7.0","49","Error"],correct:1,explain:"math.sqrt(49) returns the floating-point value 7.0."},
-      {type:"programming",topic:"random module",prompt:"After import random, which line can generate an integer from 1 through 10, including both 1 and 10?",options:["random.randint(1, 10)","random.randrange(1, 10)","random.random(1, 10)","random.range(1, 10)"],correct:0,explain:"random.randint(1, 10) includes both endpoints. random.randrange(1, 10) excludes the stop value 10."},
-      {type:"programming",topic:"text representation",prompt:"What does this code print?\nprint(ord('A'))",options:["A","1","65","97"],correct:2,explain:"ord('A') returns the Unicode code point for the character A, which is 65."},
-      {type:"logic",topic:"identifiers",prompt:"Which set contains only valid Python variable names?",options:["2cats, my cat, True","cat_2, _price, totalPrice","class, first-name, 3rd","my value, False, item#"],correct:1,explain:"Identifiers can contain letters, digits, and underscores, but cannot start with a digit, contain spaces or punctuation such as hyphens, or use Python keywords."},
-      {type:"logic",topic:"objects",prompt:"In x = 10, which description is most accurate?",options:["x is a variable name bound to an integer object","x is the integer type itself","x is the object's identity number","x is always stored as text"],correct:0,explain:"x is a name. After the assignment, that name is bound to an integer object with value 10."},
-      {type:"logic",topic:"identity",prompt:"Consider a = [1, 2] and b = [1, 2]. Which statement is correct?",options:["a == b is False because they are different objects","a == b is True, but a and b can have different identities","a and b must have the same identity","Lists do not have identities"],correct:1,explain:"The two lists contain equal values, so a == b is True. They are created as separate list objects, so they have different identities."},
-      {type:"logic",topic:"division operators",prompt:"Which statement correctly distinguishes /, //, and % for positive integers?",options:["/ gives true division, // gives floor division, and % gives the modulo result","/ and // always give the same value","% performs percentage formatting","// always rounds to the nearest integer"],correct:0,explain:"The three operators serve different purposes. / performs true division, // performs floor division, and % returns the modulo result."},
-      {type:"logic",topic:"rounding",prompt:"Which statement about Python rounding is most accurate?",options:["int() and round() always produce the same result","round(x, n) always rounds every 5 upward","int() truncates toward zero, while round() performs rounding; exact halfway behavior can follow round-to-even","floor division and round() are identical"],correct:2,explain:"int() truncates toward zero. round() performs rounding, and exact halfway cases use round-to-even behavior. Floating-point representation can also affect whether a decimal value is represented as an exact halfway case."}
+    "questions": [
+      {
+        "type": "programming",
+        "topic": "assignment",
+        "prompt": "What is the final value of x?\nx = 5\nx = x + 3\nx = x * 2",
+        "options": [
+          "8",
+          "10",
+          "16",
+          "Error"
+        ],
+        "correct": 2,
+        "explain": "x becomes 8 after x = x + 3, then 16 after x = x * 2."
+      },
+      {
+        "type": "programming",
+        "topic": "augmented assignment",
+        "prompt": "What does this code print?\nx = 10\nx += 2\nx *= 3\nprint(x)",
+        "options": [
+          "30",
+          "36",
+          "32",
+          "16"
+        ],
+        "correct": 1,
+        "explain": "x += 2 changes x from 10 to 12. Then x *= 3 changes 12 to 36."
+      },
+      {
+        "type": "programming",
+        "topic": "true division",
+        "prompt": "What does this code print?\nprint(7 / 2)",
+        "options": [
+          "3",
+          "3.0",
+          "3.5",
+          "4"
+        ],
+        "correct": 2,
+        "explain": "The / operator performs true division, so 7 / 2 evaluates to the float 3.5."
+      },
+      {
+        "type": "programming",
+        "topic": "floor division",
+        "prompt": "What does this code print?\nprint(17 // 5)",
+        "options": [
+          "3",
+          "3.4",
+          "4",
+          "2"
+        ],
+        "correct": 0,
+        "explain": "17 / 5 is 3.4. Floor division // returns the greatest integer not greater than that result, which is 3."
+      },
+      {
+        "type": "programming",
+        "topic": "modulo",
+        "prompt": "What does this code print?\nprint(17 % 5)",
+        "options": [
+          "2",
+          "3",
+          "3.4",
+          "5"
+        ],
+        "correct": 0,
+        "explain": "17 can be written as 5 * 3 + 2, so 17 % 5 is 2."
+      },
+      {
+        "type": "programming",
+        "topic": "digit extraction",
+        "prompt": "Given x = 237, which expression evaluates to the tens digit 3?",
+        "options": [
+          "x % 10",
+          "(x // 10) % 10",
+          "x // 100",
+          "x % 1000"
+        ],
+        "correct": 1,
+        "explain": "x // 10 gives 23. Then 23 % 10 gives 3, the tens digit."
+      },
+      {
+        "type": "programming",
+        "topic": "precedence",
+        "prompt": "What is the value of result?\nresult = 3 + 2 * 4",
+        "options": [
+          "20",
+          "11",
+          "14",
+          "24"
+        ],
+        "correct": 1,
+        "explain": "Multiplication is evaluated before addition, so 2 * 4 is 8 and 3 + 8 is 11."
+      },
+      {
+        "type": "programming",
+        "topic": "precedence",
+        "prompt": "Evaluate this expression:\n3 + 2 * (5 - 1) ** 2",
+        "options": [
+          "35",
+          "32",
+          "20",
+          "13"
+        ],
+        "correct": 0,
+        "explain": "(5 - 1) is 4, 4 ** 2 is 16, 2 * 16 is 32, and 3 + 32 is 35."
+      },
+      {
+        "type": "programming",
+        "topic": "float type",
+        "prompt": "What does this code print?\nx = 1\ny = 2\nz = x / y\nprint(type(z))",
+        "options": [
+          "<class 'int'>",
+          "<class 'float'>",
+          "0.5",
+          "Error"
+        ],
+        "correct": 1,
+        "explain": "For numeric operands, / returns a float. Therefore z is 0.5 and type(z) is float."
+      },
+      {
+        "type": "programming",
+        "topic": "formatting",
+        "prompt": "What does this code print?\npi = 3.14159265\nprint(f\"{pi:.3f}\")",
+        "options": [
+          "3.14",
+          "3.142",
+          "3.14159265",
+          "3"
+        ],
+        "correct": 1,
+        "explain": ".3f formats the value with three digits after the decimal point. For this value, the displayed result is 3.142."
+      },
+      {
+        "type": "programming",
+        "topic": "round",
+        "prompt": "What does this expression return?\nround(4.567, 2)",
+        "options": [
+          "4.5",
+          "4.56",
+          "4.57",
+          "5"
+        ],
+        "correct": 2,
+        "explain": "Rounding 4.567 to two digits after the decimal point gives 4.57."
+      },
+      {
+        "type": "programming",
+        "topic": "int conversion",
+        "prompt": "What does this expression return?\nint(4.9)",
+        "options": [
+          "5",
+          "4",
+          "4.9",
+          "Error"
+        ],
+        "correct": 1,
+        "explain": "int() truncates this positive float toward zero, so int(4.9) returns 4. It does not round to the nearest integer."
+      },
+      {
+        "type": "programming",
+        "topic": "math module",
+        "prompt": "What does this code print?\nimport math\nprint(math.sqrt(49))",
+        "options": [
+          "7",
+          "7.0",
+          "49",
+          "Error"
+        ],
+        "correct": 1,
+        "explain": "math.sqrt(49) returns the floating-point value 7.0."
+      },
+      {
+        "type": "programming",
+        "topic": "random module",
+        "prompt": "After import random, which line can generate an integer from 1 through 10, including both 1 and 10?",
+        "options": [
+          "random.randint(1, 10)",
+          "random.randrange(1, 10)",
+          "random.random(1, 10)",
+          "random.range(1, 10)"
+        ],
+        "correct": 0,
+        "explain": "random.randint(1, 10) includes both endpoints. random.randrange(1, 10) excludes the stop value 10."
+      },
+      {
+        "type": "programming",
+        "topic": "text representation",
+        "prompt": "What does this code print?\nprint(ord('A'))",
+        "options": [
+          "A",
+          "1",
+          "65",
+          "97"
+        ],
+        "correct": 2,
+        "explain": "ord('A') returns the Unicode code point for the character A, which is 65."
+      },
+      {
+        "type": "logic",
+        "topic": "identifiers",
+        "prompt": "Which set contains only valid Python variable names?",
+        "options": [
+          "2cats, my cat, True",
+          "cat_2, _price, totalPrice",
+          "class, first-name, 3rd",
+          "my value, False, item#"
+        ],
+        "correct": 1,
+        "explain": "Identifiers can contain letters, digits, and underscores, but cannot start with a digit, contain spaces or punctuation such as hyphens, or use Python keywords."
+      },
+      {
+        "type": "logic",
+        "topic": "objects",
+        "prompt": "In x = 10, which description is most accurate?",
+        "options": [
+          "x is a variable name bound to an integer object",
+          "x is the integer type itself",
+          "x is the object's identity number",
+          "x is always stored as text"
+        ],
+        "correct": 0,
+        "explain": "x is a name. After the assignment, that name is bound to an integer object with value 10."
+      },
+      {
+        "type": "logic",
+        "topic": "identity",
+        "prompt": "Consider a = [1, 2] and b = [1, 2]. Which statement is correct?",
+        "options": [
+          "a == b is False because they are different objects",
+          "a == b is True, but a and b can have different identities",
+          "a and b must have the same identity",
+          "Lists do not have identities"
+        ],
+        "correct": 1,
+        "explain": "The two lists contain equal values, so a == b is True. They are created as separate list objects, so they have different identities."
+      },
+      {
+        "type": "logic",
+        "topic": "division operators",
+        "prompt": "Which statement correctly distinguishes /, //, and % for positive integers?",
+        "options": [
+          "/ gives true division, // gives floor division, and % gives the modulo result",
+          "/ and // always give the same value",
+          "% performs percentage formatting",
+          "// always rounds to the nearest integer"
+        ],
+        "correct": 0,
+        "explain": "The three operators serve different purposes. / performs true division, // performs floor division, and % returns the modulo result."
+      },
+      {
+        "type": "logic",
+        "topic": "rounding",
+        "prompt": "Which statement about Python rounding is most accurate?",
+        "options": [
+          "int() and round() always produce the same result",
+          "round(x, n) always rounds every 5 upward",
+          "int() truncates toward zero, while round() performs rounding; exact halfway behavior can follow round-to-even",
+          "floor division and round() are identical"
+        ],
+        "correct": 2,
+        "explain": "int() truncates toward zero. round() performs rounding, and exact halfway cases use round-to-even behavior. Floating-point representation can also affect whether a decimal value is represented as an exact halfway case."
+      }
     ]
   },
   {
-    id: "w3",
-    title: "Types and Collections",
-    sub: "Strings, formatting, lists, tuples, sets, dictionaries, and type conversion",
-    concepts: [
+    "id": "w3",
+    "title": "Types and Collections",
+    "sub": "Strings, formatting, lists, tuples, sets, dictionaries, and type conversion",
+    "concepts": [
       {
         "title": "Strings and Indexing",
         "text": "Strings are ordered and immutable. Indexes and slices read characters, + concatenates strings, and len() reports the number of characters."
@@ -388,7 +889,7 @@ const MODULES = [
         "text": "Dictionaries map unique keys to values and support lookup, update, and removal. Conversion functions such as str(), int(), float(), list(), tuple(), and set() create values of new types."
       }
     ],
-    examples: [
+    "examples": [
       {
         "title": "Example 1: Strings, indexing, and formatting",
         "code": "word = 'Python'\nlabel = word[0] + word[-1]\nprint(f'{label}: {len(word)} letters')",
@@ -415,34 +916,274 @@ const MODULES = [
         "text": "The new dictionary entry stores 5, int() converts the text 3, and the program prints 15."
       }
     ],
-    questions: [
-      {type:"programming",topic:"string indexing",prompt:"What does this code print?\nword = \"Canada\"\nprint(word[1], word[-1])",options:["C a","a a","a d","C d"],correct:1,explain:"Index 1 is the second character, a. Index -1 is the final character, also a."},
-      {type:"programming",topic:"string immutability",prompt:"What happens when this code runs?\nword = \"Cat\"\nword[0] = \"B\"",options:["word becomes Bat","word becomes BCat","Python raises TypeError","Python raises KeyError"],correct:2,explain:"Strings are immutable, so assigning to an indexed character raises TypeError."},
-      {type:"programming",topic:"concatenation and slicing",prompt:"What does this code print?\na = \"Hello \"\nb = \"World\"\nprint(a[:-1] + b)",options:["Hello World","HelloWorld","Hello  World","Error"],correct:1,explain:"a[:-1] excludes a's trailing space, and + joins the two resulting strings without adding one."},
-      {type:"programming",topic:"f-string expressions",prompt:"What does this code print?\nitems = 3\nprice = 1.25\nprint(f\"{items} tacos cost {items * price}\")",options:["3 tacos cost 1.25","3 tacos cost 3.75","items tacos cost items * price","3 tacos cost 4.25"],correct:1,explain:"The replacement fields evaluate to 3 and 3 * 1.25, which is 3.75."},
-      {type:"programming",topic:"f-string debugging",prompt:"What does this code print?\nprint(f\"{2**3=} total\")",options:["2**3= total","2**3=3 total","2**3=8 total","8=2**3 total"],correct:2,explain:"The = form displays the expression text and its value. Since 2 ** 3 is 8, the output is 2**3=8 total."},
-      {type:"programming",topic:"format specification",prompt:"Which statement prints exactly 3.142 when pi = 3.1415926?",options:["print(f\"{pi}\")","print(f\"{pi:3f}\")","print(f\"{pi:.3f}\")","print(f\"{pi.3f}\")"],correct:2,explain:"The colon begins the format specification and .3f requests fixed-point output with three decimal places."},
-      {type:"programming",topic:"list update",prompt:"What does this code print?\ncolors = [\"red\", \"blue\", \"green\"]\ncolors[-1] = \"yellow\"\nprint(colors[2])",options:["green","yellow","blue","Error"],correct:1,explain:"Indexes -1 and 2 refer to the last element. The assignment changes that element to yellow."},
-      {type:"programming",topic:"list removal",prompt:"What does this code print?\nvalues = [1, 2, 3, 4]\nvalues.append(\"abc\")\nvalues.pop(1)\nvalues.remove(1)\nprint(values)",options:["[1, 2, 3, 4, 'abc']","[2, 3, 4, 'abc']","[3, 4, 'abc']","[3, 4]"],correct:2,explain:"append adds 'abc'; pop(1) removes 2; remove(1) then removes the value 1, leaving [3, 4, 'abc']."},
-      {type:"programming",topic:"list functions",prompt:"What does this code print?\na = [1, 2, 3, 4]\nb = [2, 3, 4, 5]\nc = a + b\nprint(len(c), max(c))",options:["8 4","8 5","4 4","4 5"],correct:1,explain:"List concatenation produces eight elements, and the largest value in the combined list is 5."},
-      {type:"programming",topic:"tuples",prompt:"What happens when this code runs?\npoint = (38.9, 77.9)\npoint[0] = 39.9",options:["point becomes (39.9, 77.9)","point becomes [39.9, 77.9]","Python raises TypeError","Python raises KeyError"],correct:2,explain:"A tuple is immutable, so its elements cannot be replaced by indexed assignment."},
-      {type:"programming",topic:"set conversion",prompt:"What does this code print?\nvalues = set([100, 200, 100, 200, 300])\nprint(len(values))",options:["3","5","300","Error"],correct:0,explain:"A set keeps unique values only, so it contains 100, 200, and 300 and has length 3."},
-      {type:"programming",topic:"set operations",prompt:"What is the value of common?\na = {1, 2, 3, 4}\nb = {2, 3, 5}\ncommon = a.intersection(b)",options:["{1, 2, 3, 4, 5}","{1, 4}","{2, 3}","{5}"],correct:2,explain:"intersection() returns elements present in both sets. Only 2 and 3 meet that condition."},
-      {type:"programming",topic:"dictionaries",prompt:"What does this code print?\nprofile = {\"name\": \"Amy\", \"age\": 20}\nprofile[\"occupation\"] = \"student\"\ndel profile[\"name\"]\nprint(profile[\"occupation\"])",options:["Amy","20","student","Error"],correct:2,explain:"The occupation entry is added and is unaffected when the name entry is deleted, so student is printed."},
-      {type:"programming",topic:"type conversion",prompt:"What does this code print?\ntext = \"7.99\"\nvalue = int(float(text))\nprint(value)",options:["7","7.99","8","Python raises ValueError"],correct:0,explain:"float('7.99') creates 7.99, then int() drops the fractional part toward zero and returns 7."},
-      {type:"programming",topic:"review: random ranges",prompt:"After import random, which set lists every possible result of random.randrange(1, 5)?",options:["{0, 1, 2, 3, 4}","{1, 2, 3, 4}","{1, 2, 3, 4, 5}","Any float from 1 through 5"],correct:1,explain:"randrange includes the start value 1 and excludes the stop value 5, so the possible integers are 1 through 4."},
-      {type:"logic",topic:"collection properties",prompt:"Which comparison is correct?",options:["Lists and tuples are both mutable","Sets preserve duplicates and support positional indexing","Lists are ordered and mutable, while tuples are ordered and immutable","Dictionaries are accessed only by numeric position"],correct:2,explain:"Lists and tuples are both ordered sequences, but list elements can be changed while tuple elements cannot."},
-      {type:"logic",topic:"empty containers",prompt:"Which pair correctly creates an empty dictionary and an empty set?",options:["{} and set()","set() and {}","[] and ()","dict() and {}"],correct:0,explain:"{} is an empty dictionary. set() is required for an empty set because empty braces already denote a dictionary."},
-      {type:"logic",topic:"dictionary keys",prompt:"Which value can be used as a dictionary key because it is immutable?",options:["[1, 2]","{1, 2}","(1, 2)","{\"x\": 1}"],correct:2,explain:"A tuple whose contents are immutable can be a dictionary key. Lists, sets, and dictionaries are mutable and cannot be keys."},
-      {type:"logic",topic:"removal methods",prompt:"What is the key difference between set.remove(value) and set.discard(value) when value is absent?",options:["remove() raises KeyError, while discard() does nothing","discard() raises KeyError, while remove() does nothing","Both always raise KeyError","Both remove an arbitrary element"],correct:0,explain:"Both target a value, but only remove() raises KeyError when that value is not present."},
-      {type:"logic",topic:"implicit conversion",prompt:"Why does 1 + 2.0 produce a float result?",options:["Python converts the integer operand to a compatible float representation for the operation","All arithmetic results are strings","The decimal point is ignored","float values are automatically truncated to integers"],correct:0,explain:"Mixed integer and floating-point arithmetic uses an implicit numeric conversion, so the result is the float 3.0."}
+    "questions": [
+      {
+        "type": "programming",
+        "topic": "string indexing",
+        "prompt": "What does this code print?\nword = \"Canada\"\nprint(word[1], word[-1])",
+        "options": [
+          "C a",
+          "a a",
+          "a d",
+          "C d"
+        ],
+        "correct": 1,
+        "explain": "Index 1 is the second character, a. Index -1 is the final character, also a."
+      },
+      {
+        "type": "programming",
+        "topic": "string immutability",
+        "prompt": "What happens when this code runs?\nword = \"Cat\"\nword[0] = \"B\"",
+        "options": [
+          "word becomes Bat",
+          "word becomes BCat",
+          "Python raises TypeError",
+          "Python raises KeyError"
+        ],
+        "correct": 2,
+        "explain": "Strings are immutable, so assigning to an indexed character raises TypeError."
+      },
+      {
+        "type": "programming",
+        "topic": "concatenation and slicing",
+        "prompt": "What does this code print?\na = \"Hello \"\nb = \"World\"\nprint(a[:-1] + b)",
+        "options": [
+          "Hello World",
+          "HelloWorld",
+          "Hello  World",
+          "Error"
+        ],
+        "correct": 1,
+        "explain": "a[:-1] excludes a's trailing space, and + joins the two resulting strings without adding one."
+      },
+      {
+        "type": "programming",
+        "topic": "f-string expressions",
+        "prompt": "What does this code print?\nitems = 3\nprice = 1.25\nprint(f\"{items} tacos cost {items * price}\")",
+        "options": [
+          "3 tacos cost 1.25",
+          "3 tacos cost 3.75",
+          "items tacos cost items * price",
+          "3 tacos cost 4.25"
+        ],
+        "correct": 1,
+        "explain": "The replacement fields evaluate to 3 and 3 * 1.25, which is 3.75."
+      },
+      {
+        "type": "programming",
+        "topic": "f-string debugging",
+        "prompt": "What does this code print?\nprint(f\"{2**3=} total\")",
+        "options": [
+          "2**3= total",
+          "2**3=3 total",
+          "2**3=8 total",
+          "8=2**3 total"
+        ],
+        "correct": 2,
+        "explain": "The = form displays the expression text and its value. Since 2 ** 3 is 8, the output is 2**3=8 total."
+      },
+      {
+        "type": "programming",
+        "topic": "format specification",
+        "prompt": "Which statement prints exactly 3.142 when pi = 3.1415926?",
+        "options": [
+          "print(f\"{pi}\")",
+          "print(f\"{pi:3f}\")",
+          "print(f\"{pi:.3f}\")",
+          "print(f\"{pi.3f}\")"
+        ],
+        "correct": 2,
+        "explain": "The colon begins the format specification and .3f requests fixed-point output with three decimal places."
+      },
+      {
+        "type": "programming",
+        "topic": "list update",
+        "prompt": "What does this code print?\ncolors = [\"red\", \"blue\", \"green\"]\ncolors[-1] = \"yellow\"\nprint(colors[2])",
+        "options": [
+          "green",
+          "yellow",
+          "blue",
+          "Error"
+        ],
+        "correct": 1,
+        "explain": "Indexes -1 and 2 refer to the last element. The assignment changes that element to yellow."
+      },
+      {
+        "type": "programming",
+        "topic": "list removal",
+        "prompt": "What does this code print?\nvalues = [1, 2, 3, 4]\nvalues.append(\"abc\")\nvalues.pop(1)\nvalues.remove(1)\nprint(values)",
+        "options": [
+          "[1, 2, 3, 4, 'abc']",
+          "[2, 3, 4, 'abc']",
+          "[3, 4, 'abc']",
+          "[3, 4]"
+        ],
+        "correct": 2,
+        "explain": "append adds 'abc'; pop(1) removes 2; remove(1) then removes the value 1, leaving [3, 4, 'abc']."
+      },
+      {
+        "type": "programming",
+        "topic": "list functions",
+        "prompt": "What does this code print?\na = [1, 2, 3, 4]\nb = [2, 3, 4, 5]\nc = a + b\nprint(len(c), max(c))",
+        "options": [
+          "8 4",
+          "8 5",
+          "4 4",
+          "4 5"
+        ],
+        "correct": 1,
+        "explain": "List concatenation produces eight elements, and the largest value in the combined list is 5."
+      },
+      {
+        "type": "programming",
+        "topic": "tuples",
+        "prompt": "What happens when this code runs?\npoint = (38.9, 77.9)\npoint[0] = 39.9",
+        "options": [
+          "point becomes (39.9, 77.9)",
+          "point becomes [39.9, 77.9]",
+          "Python raises TypeError",
+          "Python raises KeyError"
+        ],
+        "correct": 2,
+        "explain": "A tuple is immutable, so its elements cannot be replaced by indexed assignment."
+      },
+      {
+        "type": "programming",
+        "topic": "set conversion",
+        "prompt": "What does this code print?\nvalues = set([100, 200, 100, 200, 300])\nprint(len(values))",
+        "options": [
+          "3",
+          "5",
+          "300",
+          "Error"
+        ],
+        "correct": 0,
+        "explain": "A set keeps unique values only, so it contains 100, 200, and 300 and has length 3."
+      },
+      {
+        "type": "programming",
+        "topic": "set operations",
+        "prompt": "What is the value of common?\na = {1, 2, 3, 4}\nb = {2, 3, 5}\ncommon = a.intersection(b)",
+        "options": [
+          "{1, 2, 3, 4, 5}",
+          "{1, 4}",
+          "{2, 3}",
+          "{5}"
+        ],
+        "correct": 2,
+        "explain": "intersection() returns elements present in both sets. Only 2 and 3 meet that condition."
+      },
+      {
+        "type": "programming",
+        "topic": "dictionaries",
+        "prompt": "What does this code print?\nprofile = {\"name\": \"Amy\", \"age\": 20}\nprofile[\"occupation\"] = \"student\"\ndel profile[\"name\"]\nprint(profile[\"occupation\"])",
+        "options": [
+          "Amy",
+          "20",
+          "student",
+          "Error"
+        ],
+        "correct": 2,
+        "explain": "The occupation entry is added and is unaffected when the name entry is deleted, so student is printed."
+      },
+      {
+        "type": "programming",
+        "topic": "type conversion",
+        "prompt": "What does this code print?\ntext = \"7.99\"\nvalue = int(float(text))\nprint(value)",
+        "options": [
+          "7",
+          "7.99",
+          "8",
+          "Python raises ValueError"
+        ],
+        "correct": 0,
+        "explain": "float('7.99') creates 7.99, then int() drops the fractional part toward zero and returns 7."
+      },
+      {
+        "type": "programming",
+        "topic": "review: random ranges",
+        "prompt": "After import random, which set lists every possible result of random.randrange(1, 5)?",
+        "options": [
+          "{0, 1, 2, 3, 4}",
+          "{1, 2, 3, 4}",
+          "{1, 2, 3, 4, 5}",
+          "Any float from 1 through 5"
+        ],
+        "correct": 1,
+        "explain": "randrange includes the start value 1 and excludes the stop value 5, so the possible integers are 1 through 4."
+      },
+      {
+        "type": "logic",
+        "topic": "collection properties",
+        "prompt": "Which comparison is correct?",
+        "options": [
+          "Lists and tuples are both mutable",
+          "Sets preserve duplicates and support positional indexing",
+          "Lists are ordered and mutable, while tuples are ordered and immutable",
+          "Dictionaries are accessed only by numeric position"
+        ],
+        "correct": 2,
+        "explain": "Lists and tuples are both ordered sequences, but list elements can be changed while tuple elements cannot."
+      },
+      {
+        "type": "logic",
+        "topic": "empty containers",
+        "prompt": "Which pair correctly creates an empty dictionary and an empty set?",
+        "options": [
+          "{} and set()",
+          "set() and {}",
+          "[] and ()",
+          "dict() and {}"
+        ],
+        "correct": 0,
+        "explain": "{} is an empty dictionary. set() is required for an empty set because empty braces already denote a dictionary."
+      },
+      {
+        "type": "logic",
+        "topic": "dictionary keys",
+        "prompt": "Which value can be used as a dictionary key because it is immutable?",
+        "options": [
+          "[1, 2]",
+          "{1, 2}",
+          "(1, 2)",
+          "{\"x\": 1}"
+        ],
+        "correct": 2,
+        "explain": "A tuple whose contents are immutable can be a dictionary key. Lists, sets, and dictionaries are mutable and cannot be keys."
+      },
+      {
+        "type": "logic",
+        "topic": "removal methods",
+        "prompt": "What is the key difference between set.remove(value) and set.discard(value) when value is absent?",
+        "options": [
+          "remove() raises KeyError, while discard() does nothing",
+          "discard() raises KeyError, while remove() does nothing",
+          "Both always raise KeyError",
+          "Both remove an arbitrary element"
+        ],
+        "correct": 0,
+        "explain": "Both target a value, but only remove() raises KeyError when that value is not present."
+      },
+      {
+        "type": "logic",
+        "topic": "implicit conversion",
+        "prompt": "Why does 1 + 2.0 produce a float result?",
+        "options": [
+          "Python converts the integer operand to a compatible float representation for the operation",
+          "All arithmetic results are strings",
+          "The decimal point is ignored",
+          "float values are automatically truncated to integers"
+        ],
+        "correct": 0,
+        "explain": "Mixed integer and floating-point arithmetic uses an implicit numeric conversion, so the result is the float 3.0."
+      }
     ]
   },
   {
-    id: "w4",
-    title: "Branching",
-    sub: "Conditions, ranges, logical operators, nested branches, membership, and identity",
-    concepts: [
+    "id": "w4",
+    "title": "Branching",
+    "sub": "Conditions, ranges, logical operators, nested branches, membership, and identity",
+    "concepts": [
       {
         "title": "If and Else Branches",
         "text": "An if condition selects an indented block when it is True. An optional else block provides the alternative when the condition is False."
@@ -464,7 +1205,7 @@ const MODULES = [
         "text": "in tests container membership, while is tests whether names refer to the same object. A conditional expression chooses one of two values in a single expression."
       }
     ],
-    examples: [
+    "examples": [
       {
         "title": "Example 1: An if-else choice",
         "code": "age = 22\nif age < 25:\n    price = 4800\nelse:\n    price = 2200\nprint(price)",
@@ -491,27 +1232,267 @@ const MODULES = [
         "text": "The value 2 is a member of a, a and b have equal contents, and c refers to the same object as a. All three results are True."
       }
     ],
-    questions: [
-      {type:"programming",topic:"if branch",prompt:"What does this code print?\nvalue = -20\nif value < 0:\n    value = -value\nprint(value)",options:["-20","0","20","Error"],correct:2,explain:"The condition is True, so value is assigned its negation, 20, before print() runs."},
-      {type:"programming",topic:"if branch",prompt:"What does this code print?\nitems = 1\nbonus = 0\nif bonus == 10:\n    items = items + 3\nprint(items)",options:["0","1","3","4"],correct:1,explain:"bonus == 10 is False, so the indented assignment is skipped and items remains 1."},
-      {type:"programming",topic:"if-else",prompt:"What does this code print?\nage = 25\nif age < 25:\n    price = 4800\nelse:\n    price = 2200\nprint(price)",options:["25","2200","4800","Error"],correct:1,explain:"25 is not less than 25, so the else branch assigns 2200."},
-      {type:"programming",topic:"elif order",prompt:"What does this code print?\nx = 0\nif x > 0:\n    label = \"Positive\"\nelif x == 0:\n    label = \"Neutral\"\nelse:\n    label = \"Negative\"\nprint(label)",options:["Positive","Neutral","Negative","No output"],correct:1,explain:"The first condition is False and x == 0 is True, so Neutral is selected."},
-      {type:"programming",topic:"equality",prompt:"What is the final value of total?\ntotal = 5\ncode = \"A\"\nif code == \"A\":\n    total = total + 4",options:["4","5","9","Error"],correct:2,explain:"The strings are equal, so the branch adds 4 to the starting value 5."},
-      {type:"programming",topic:"ordered ranges",prompt:"What does this code print?\nage = 24\nif age < 16:\n    price = 0\nelif age < 25:\n    price = 4800\nelif age < 40:\n    price = 2350\nelse:\n    price = 2100\nprint(price)",options:["0","2100","2350","4800"],correct:3,explain:"The first test is False, but 24 < 25 is True, so the second branch assigns 4800 and later branches are skipped."},
-      {type:"programming",topic:"comparison chaining",prompt:"What does this code print?\nx = -5\nif 0 <= -x * 2 <= 20:\n    x = -1\nelse:\n    x = x * 2\nx = x - 1\nprint(x)",options:["-11","-2","-1","10"],correct:1,explain:"-x * 2 is 10, which is within the inclusive range. x becomes -1 and is then reduced to -2."},
-      {type:"programming",topic:"logical and",prompt:"What does this code print?\nyear = 2050\nvalid = year >= 2001 and year <= 2100\nprint(valid)",options:["True","False","2050","Error"],correct:0,explain:"Both comparisons are True, so and evaluates to True."},
-      {type:"programming",topic:"logical or",prompt:"What does this code print?\nage = 40\nif age <= 12 or age >= 65:\n    price = 8\nelse:\n    price = 12\nprint(price)",options:["8","12","40","False"],correct:1,explain:"Neither discounted range contains 40, so the or condition is False and the else branch assigns 12."},
-      {type:"programming",topic:"logical not",prompt:"What does this expression produce when a = 8 and b = 7?\nnot (a < b or a > 9)",options:["True","False","8","Error"],correct:0,explain:"Both inner comparisons are False. False or False is False, and not False is True."},
-      {type:"programming",topic:"independent branches",prompt:"What does this code print?\nx = 6\nresult = \"\"\nif x > 0:\n    result = result + \"P\"\nif x % 2 == 0:\n    result = result + \"E\"\nprint(result)",options:["P","E","PE","No output"],correct:2,explain:"The two if statements are independent and both conditions are True, so both letters are appended."},
-      {type:"programming",topic:"nested branches",prompt:"What does this code print?\nscore = 82\nif score >= 50:\n    if score >= 90:\n        print(\"High distinction\")\n    elif score >= 80:\n        print(\"Distinction\")\n    else:\n        print(\"Pass\")\nelse:\n    print(\"Fail\")",options:["High distinction","Distinction","Pass","Fail"],correct:1,explain:"82 passes the outer test, fails the nested 90 test, and passes the nested 80 test."},
-      {type:"programming",topic:"sequence comparison",prompt:"What does this code print?\nx = [1, 5, 2]\ny = [1, 4, 9]\nprint(x > y)",options:["True","False","[1, 5, 2]","Error"],correct:0,explain:"The first elements tie, then 5 is compared with 4. Because 5 > 4, x > y is True."},
-      {type:"programming",topic:"membership",prompt:"What does this code print?\nprices = {\"first\": 1000, \"economy\": 300}\nprint(300 in prices, 300 in prices.values())",options:["True True","True False","False True","False False"],correct:2,explain:"Dictionary membership checks keys, so 300 is not in prices. It is, however, among prices.values()."},
-      {type:"programming",topic:"conditional expression",prompt:"What does this code print?\nhours = 50\nrate = 30\ntotal = rate * hours if hours < 40 else rate * hours * 1.2\nprint(total)",options:["1000","1500","1800.0","2000"],correct:2,explain:"hours < 40 is False, so the expression after else is used: 30 * 50 * 1.2 equals 1800.0."},
-      {type:"logic",topic:"elif behavior",prompt:"In an if-elif-else chain, what happens after one condition is found to be True?",options:["Every later condition is also evaluated","Only that branch runs and the rest of the chain is skipped","The else branch always runs too","Python restarts at the first condition"],correct:1,explain:"A multi-branch chain selects at most one branch: the first branch whose condition is True."},
-      {type:"logic",topic:"implicit bounds",prompt:"Why can an increasing chain use elif age < 25 without repeating age >= 16 after an earlier if age < 16?",options:["elif automatically means age is positive","Reaching the elif already means age < 16 was False","Python ignores lower bounds","The else keyword converts age to an integer"],correct:1,explain:"The earlier condition being False guarantees age >= 16, so that lower bound is implicit when the elif is reached."},
-      {type:"logic",topic:"membership and identity",prompt:"Which statement correctly distinguishes in from is?",options:["in tests object identity, while is tests membership","Both compare only numeric values","in tests membership, while is tests whether two names refer to the same object","is should replace == in all value comparisons"],correct:2,explain:"Membership operators search a container. Identity operators compare object identity and are not general value-equality tests."},
-      {type:"logic",topic:"indentation",prompt:"What defines a Python code block after an if statement?",options:["Matching braces around the statements","A semicolon after every statement","A consistent increased indentation level","Quotation marks around the block"],correct:2,explain:"Python groups block statements by indentation. Lines in the same block use the same consistent indentation level."},
-      {type:"logic",topic:"floating-point comparison",prompt:"Why should programs be cautious about testing computed floating-point values with ==?",options:["Floats cannot be compared at all","Many decimal values are represented approximately, so results may differ by a tiny amount","== converts every float to a string","Float comparisons always raise TypeError"],correct:1,explain:"Binary floating-point cannot represent every decimal value exactly, so a computed result may be extremely close to, but not exactly equal to, the expected value."}
+    "questions": [
+      {
+        "type": "programming",
+        "topic": "if branch",
+        "prompt": "What does this code print?\nvalue = -20\nif value < 0:\n    value = -value\nprint(value)",
+        "options": [
+          "-20",
+          "0",
+          "20",
+          "Error"
+        ],
+        "correct": 2,
+        "explain": "The condition is True, so value is assigned its negation, 20, before print() runs."
+      },
+      {
+        "type": "programming",
+        "topic": "if branch",
+        "prompt": "What does this code print?\nitems = 1\nbonus = 0\nif bonus == 10:\n    items = items + 3\nprint(items)",
+        "options": [
+          "0",
+          "1",
+          "3",
+          "4"
+        ],
+        "correct": 1,
+        "explain": "bonus == 10 is False, so the indented assignment is skipped and items remains 1."
+      },
+      {
+        "type": "programming",
+        "topic": "if-else",
+        "prompt": "What does this code print?\nage = 25\nif age < 25:\n    price = 4800\nelse:\n    price = 2200\nprint(price)",
+        "options": [
+          "25",
+          "2200",
+          "4800",
+          "Error"
+        ],
+        "correct": 1,
+        "explain": "25 is not less than 25, so the else branch assigns 2200."
+      },
+      {
+        "type": "programming",
+        "topic": "elif order",
+        "prompt": "What does this code print?\nx = 0\nif x > 0:\n    label = \"Positive\"\nelif x == 0:\n    label = \"Neutral\"\nelse:\n    label = \"Negative\"\nprint(label)",
+        "options": [
+          "Positive",
+          "Neutral",
+          "Negative",
+          "No output"
+        ],
+        "correct": 1,
+        "explain": "The first condition is False and x == 0 is True, so Neutral is selected."
+      },
+      {
+        "type": "programming",
+        "topic": "equality",
+        "prompt": "What is the final value of total?\ntotal = 5\ncode = \"A\"\nif code == \"A\":\n    total = total + 4",
+        "options": [
+          "4",
+          "5",
+          "9",
+          "Error"
+        ],
+        "correct": 2,
+        "explain": "The strings are equal, so the branch adds 4 to the starting value 5."
+      },
+      {
+        "type": "programming",
+        "topic": "ordered ranges",
+        "prompt": "What does this code print?\nage = 24\nif age < 16:\n    price = 0\nelif age < 25:\n    price = 4800\nelif age < 40:\n    price = 2350\nelse:\n    price = 2100\nprint(price)",
+        "options": [
+          "0",
+          "2100",
+          "2350",
+          "4800"
+        ],
+        "correct": 3,
+        "explain": "The first test is False, but 24 < 25 is True, so the second branch assigns 4800 and later branches are skipped."
+      },
+      {
+        "type": "programming",
+        "topic": "comparison chaining",
+        "prompt": "What does this code print?\nx = -5\nif 0 <= -x * 2 <= 20:\n    x = -1\nelse:\n    x = x * 2\nx = x - 1\nprint(x)",
+        "options": [
+          "-11",
+          "-2",
+          "-1",
+          "10"
+        ],
+        "correct": 1,
+        "explain": "-x * 2 is 10, which is within the inclusive range. x becomes -1 and is then reduced to -2."
+      },
+      {
+        "type": "programming",
+        "topic": "logical and",
+        "prompt": "What does this code print?\nyear = 2050\nvalid = year >= 2001 and year <= 2100\nprint(valid)",
+        "options": [
+          "True",
+          "False",
+          "2050",
+          "Error"
+        ],
+        "correct": 0,
+        "explain": "Both comparisons are True, so and evaluates to True."
+      },
+      {
+        "type": "programming",
+        "topic": "logical or",
+        "prompt": "What does this code print?\nage = 40\nif age <= 12 or age >= 65:\n    price = 8\nelse:\n    price = 12\nprint(price)",
+        "options": [
+          "8",
+          "12",
+          "40",
+          "False"
+        ],
+        "correct": 1,
+        "explain": "Neither discounted range contains 40, so the or condition is False and the else branch assigns 12."
+      },
+      {
+        "type": "programming",
+        "topic": "logical not",
+        "prompt": "What does this expression produce when a = 8 and b = 7?\nnot (a < b or a > 9)",
+        "options": [
+          "True",
+          "False",
+          "8",
+          "Error"
+        ],
+        "correct": 0,
+        "explain": "Both inner comparisons are False. False or False is False, and not False is True."
+      },
+      {
+        "type": "programming",
+        "topic": "independent branches",
+        "prompt": "What does this code print?\nx = 6\nresult = \"\"\nif x > 0:\n    result = result + \"P\"\nif x % 2 == 0:\n    result = result + \"E\"\nprint(result)",
+        "options": [
+          "P",
+          "E",
+          "PE",
+          "No output"
+        ],
+        "correct": 2,
+        "explain": "The two if statements are independent and both conditions are True, so both letters are appended."
+      },
+      {
+        "type": "programming",
+        "topic": "nested branches",
+        "prompt": "What does this code print?\nscore = 82\nif score >= 50:\n    if score >= 90:\n        print(\"High distinction\")\n    elif score >= 80:\n        print(\"Distinction\")\n    else:\n        print(\"Pass\")\nelse:\n    print(\"Fail\")",
+        "options": [
+          "High distinction",
+          "Distinction",
+          "Pass",
+          "Fail"
+        ],
+        "correct": 1,
+        "explain": "82 passes the outer test, fails the nested 90 test, and passes the nested 80 test."
+      },
+      {
+        "type": "programming",
+        "topic": "sequence comparison",
+        "prompt": "What does this code print?\nx = [1, 5, 2]\ny = [1, 4, 9]\nprint(x > y)",
+        "options": [
+          "True",
+          "False",
+          "[1, 5, 2]",
+          "Error"
+        ],
+        "correct": 0,
+        "explain": "The first elements tie, then 5 is compared with 4. Because 5 > 4, x > y is True."
+      },
+      {
+        "type": "programming",
+        "topic": "membership",
+        "prompt": "What does this code print?\nprices = {\"first\": 1000, \"economy\": 300}\nprint(300 in prices, 300 in prices.values())",
+        "options": [
+          "True True",
+          "True False",
+          "False True",
+          "False False"
+        ],
+        "correct": 2,
+        "explain": "Dictionary membership checks keys, so 300 is not in prices. It is, however, among prices.values()."
+      },
+      {
+        "type": "programming",
+        "topic": "conditional expression",
+        "prompt": "What does this code print?\nhours = 50\nrate = 30\ntotal = rate * hours if hours < 40 else rate * hours * 1.2\nprint(total)",
+        "options": [
+          "1000",
+          "1500",
+          "1800.0",
+          "2000"
+        ],
+        "correct": 2,
+        "explain": "hours < 40 is False, so the expression after else is used: 30 * 50 * 1.2 equals 1800.0."
+      },
+      {
+        "type": "logic",
+        "topic": "elif behavior",
+        "prompt": "In an if-elif-else chain, what happens after one condition is found to be True?",
+        "options": [
+          "Every later condition is also evaluated",
+          "Only that branch runs and the rest of the chain is skipped",
+          "The else branch always runs too",
+          "Python restarts at the first condition"
+        ],
+        "correct": 1,
+        "explain": "A multi-branch chain selects at most one branch: the first branch whose condition is True."
+      },
+      {
+        "type": "logic",
+        "topic": "implicit bounds",
+        "prompt": "Why can an increasing chain use elif age < 25 without repeating age >= 16 after an earlier if age < 16?",
+        "options": [
+          "elif automatically means age is positive",
+          "Reaching the elif already means age < 16 was False",
+          "Python ignores lower bounds",
+          "The else keyword converts age to an integer"
+        ],
+        "correct": 1,
+        "explain": "The earlier condition being False guarantees age >= 16, so that lower bound is implicit when the elif is reached."
+      },
+      {
+        "type": "logic",
+        "topic": "membership and identity",
+        "prompt": "Which statement correctly distinguishes in from is?",
+        "options": [
+          "in tests object identity, while is tests membership",
+          "Both compare only numeric values",
+          "in tests membership, while is tests whether two names refer to the same object",
+          "is should replace == in all value comparisons"
+        ],
+        "correct": 2,
+        "explain": "Membership operators search a container. Identity operators compare object identity and are not general value-equality tests."
+      },
+      {
+        "type": "logic",
+        "topic": "indentation",
+        "prompt": "What defines a Python code block after an if statement?",
+        "options": [
+          "Matching braces around the statements",
+          "A semicolon after every statement",
+          "A consistent increased indentation level",
+          "Quotation marks around the block"
+        ],
+        "correct": 2,
+        "explain": "Python groups block statements by indentation. Lines in the same block use the same consistent indentation level."
+      },
+      {
+        "type": "logic",
+        "topic": "floating-point comparison",
+        "prompt": "Why should programs be cautious about testing computed floating-point values with ==?",
+        "options": [
+          "Floats cannot be compared at all",
+          "Many decimal values are represented approximately, so results may differ by a tiny amount",
+          "== converts every float to a string",
+          "Float comparisons always raise TypeError"
+        ],
+        "correct": 1,
+        "explain": "Binary floating-point cannot represent every decimal value exactly, so a computed result may be extremely close to, but not exactly equal to, the expected value."
+      }
     ]
   },
   {
@@ -884,26 +1865,266 @@ const MODULES = [
       }
     ],
     "questions": [
-      {"type":"programming","topic":"definition and call","prompt":"What does this code print?\ndef greet():\n    print('Hello')\n\ngreet()\ngreet()","options":["Hello once","Hello twice on separate lines","Nothing","None twice"],"correct":1,"explain":"Defining greet does not print anything, but each of the two calls executes the body and prints Hello."},
-      {"type":"programming","topic":"return value","prompt":"What does this code print?\ndef add(a, b):\n    return a + b\n\nresult = add(3, 5)\nprint(result)","options":["3","5","8","None"],"correct":2,"explain":"Parameters a and b receive 3 and 5. The function returns their sum, 8, which is assigned to result and printed."},
-      {"type":"programming","topic":"early return","prompt":"What does this code print?\ndef mystery(x):\n    print('Step 1')\n    return x * 2\n    print('Step 2')\n\nprint(mystery(5))","options":["Step 1, Step 2, then 10","Step 1, then 10","10, then Step 1","Step 1, then Step 2"],"correct":1,"explain":"Step 1 is printed, then return produces 10 and ends the call. Step 2 is unreachable, and the outer print displays 10."},
-      {"type":"programming","topic":"None return","prompt":"What happens when this code runs?\ndef double(x):\n    print(x * 2)\n\nresult = double(5) + 3","options":["result becomes 13","result becomes 10","10 is printed, then TypeError is raised","Nothing is printed and result becomes None"],"correct":2,"explain":"double(5) prints 10 but returns None. Python then attempts None + 3, which raises TypeError."},
-      {"type":"programming","topic":"parameters and arguments","prompt":"What does this code print?\ndef calculate(a, b):\n    return a * b\n\nx = 4\nprint(calculate(x + 1, 3))","options":["12","15","21","Error"],"correct":1,"explain":"The argument x + 1 evaluates to 5, so the function returns 5 * 3, which is 15."},
-      {"type":"programming","topic":"hierarchical calls","prompt":"What does this code print?\ndef radius(diameter):\n    return diameter / 2\n\ndef area(diameter):\n    r = radius(diameter)\n    return 3 * r * r\n\nprint(area(4))","options":["6.0","12.0","24.0","48.0"],"correct":1,"explain":"radius(4) returns 2.0. area() then returns 3 * 2.0 * 2.0, which is 12.0."},
-      {"type":"programming","topic":"dynamic typing","prompt":"What does this code print?\ndef repeat(x):\n    return x * 2\n\nprint(repeat(3))\nprint(repeat('Go'))","options":["6 followed by GoGo","33 followed by Go2","6 followed by an error","3 followed by Go"],"correct":0,"explain":"Integer multiplication gives 6, while multiplying the string by 2 repeats it and gives GoGo."},
-      {"type":"programming","topic":"branches in functions","prompt":"What does this code print?\ndef ticket_price(age):\n    if age < 5 or age > 78:\n        return 5\n    elif 17 <= age <= 58:\n        return 28\n    return 16\n\nprint(ticket_price(12))","options":["5","12","16","28"],"correct":2,"explain":"Age 12 matches neither the first condition nor the 17-through-58 condition, so the final return sends back 16."},
-      {"type":"programming","topic":"loops in functions","prompt":"What does this code print?\ndef count_even(values):\n    count = 0\n    for value in values:\n        if value % 2 == 0:\n            count += 1\n    return count\n\nprint(count_even([2, 3, 4, 7, 8]))","options":["2","3","4","14"],"correct":1,"explain":"The even elements are 2, 4, and 8, so count is increased three times and 3 is returned."},
-      {"type":"programming","topic":"scope","prompt":"What does this code print?\nstatus = 'closed'\n\ndef open_store():\n    status = 'open'\n\nopen_store()\nprint(status)","options":["open","closed","None","NameError"],"correct":1,"explain":"The assignment inside open_store creates a local status. It does not rebind the global status, which remains closed."},
-      {"type":"programming","topic":"argument mutability","prompt":"What does this code print?\ndef update(salary, bonuses):\n    salary += 1000\n    bonuses.append(500)\n\npay = 5000\nextras = [1000, 2000]\nupdate(pay, extras)\nprint(pay, extras)","options":["6000 [1000, 2000, 500]","5000 [1000, 2000, 500]","6000 [1000, 2000]","5000 [1000, 2000]"],"correct":1,"explain":"salary is rebound to a new integer locally, so pay stays 5000. append() mutates the shared list, so extras gains 500."},
-      {"type":"programming","topic":"keyword arguments","prompt":"What does this code print?\ndef order(size, topping):\n    print(size, topping)\n\norder(topping='Mushroom', size='Large')","options":["Mushroom Large","Large Mushroom","Large topping","SyntaxError"],"correct":1,"explain":"Keyword arguments match by parameter name rather than order, so size receives Large and topping receives Mushroom."},
-      {"type":"programming","topic":"default parameters","prompt":"What does this code print?\ndef salary(base=3000, bonus=500):\n    return base + bonus\n\nprint(salary(4000))\nprint(salary())","options":["4000 then 3000","4500 then 3500","4500 then 3000","5000 then 3500"],"correct":1,"explain":"The first call uses base 4000 and default bonus 500. The second uses both defaults, giving 3500."},
-      {"type":"programming","topic":"arbitrary arguments","prompt":"What does this code print?\ndef total(base, *extras):\n    print(extras)\n    return base + sum(extras)\n\nprint(total(10, 2, 3))","options":["[2, 3] then 15","(2, 3) then 15","(10, 2, 3) then 15","(2, 3) then 6"],"correct":1,"explain":"*extras collects the additional positional arguments into the tuple (2, 3). Adding them to base returns 15."},
-      {"type":"programming","topic":"multiple outputs","prompt":"What does this code print?\ndef get_stats():\n    return 80, 5\n\naverage, deviation = get_stats()\nprint(average + deviation)","options":["(80, 5)","805","85","ValueError"],"correct":2,"explain":"The returned tuple is unpacked into average and deviation. Adding 80 and 5 produces 85."},
-      {"type":"logic","topic":"definition and execution","prompt":"Which statement correctly describes defining and calling a function?","options":["A def statement always executes the body immediately","Defining creates the function; calling it executes its body","A function can be called only inside another function","Every function must print a value"],"correct":1,"explain":"The def statement creates and binds the function object. Its body runs only when the function is called."},
-      {"type":"logic","topic":"parameters and arguments","prompt":"Which description correctly distinguishes a parameter from an argument?","options":["A parameter appears in the definition; an argument is supplied in a call","A parameter is always numeric; an argument is always text","An argument appears only in return statements","They are unrelated to function inputs"],"correct":0,"explain":"Parameters are the input names declared by the function, while arguments are the actual values or expressions supplied by the caller."},
-      {"type":"logic","topic":"pass-by-assignment","prompt":"Which statement best describes Python's function argument behavior?","options":["Every argument is copied deeply before a call","Parameters are bound to the passed objects; mutation may be visible, while rebinding a parameter is local","A function can never affect a list supplied by its caller","Assigning to any parameter automatically changes the caller's variable"],"correct":1,"explain":"Python binds parameters to the supplied objects. Mutating a shared mutable object can be observed by the caller, but rebinding the local parameter does not rebind the caller's name."},
-      {"type":"logic","topic":"argument rules","prompt":"Which rule about function arguments is correct?","options":["Positional arguments may follow keyword arguments in the same call","Keyword arguments must follow the definition's written order","Positional arguments must come before keyword arguments in a call","Every parameter must have a default"],"correct":2,"explain":"Python requires positional arguments before keyword arguments. Keyword arguments can then be ordered by name."},
-      {"type":"logic","topic":"stubs and documentation","prompt":"Which pairing is correct?","options":["pass documents a function for help(), while a docstring raises an error","NotImplementedError signals unfinished behavior, while a docstring documents purpose and use","A docstring collects extra positional arguments, while *args creates documentation","help() completes an unfinished function body"],"correct":1,"explain":"Raising NotImplementedError makes unfinished behavior explicit. A docstring records documentation that tools such as help() can display."}
+      {
+        "type": "programming",
+        "topic": "definition and call",
+        "prompt": "What does this code print?\ndef greet():\n    print('Hello')\n\ngreet()\ngreet()",
+        "options": [
+          "Hello once",
+          "Hello twice on separate lines",
+          "Nothing",
+          "None twice"
+        ],
+        "correct": 1,
+        "explain": "Defining greet does not print anything, but each of the two calls executes the body and prints Hello."
+      },
+      {
+        "type": "programming",
+        "topic": "return value",
+        "prompt": "What does this code print?\ndef add(a, b):\n    return a + b\n\nresult = add(3, 5)\nprint(result)",
+        "options": [
+          "3",
+          "5",
+          "8",
+          "None"
+        ],
+        "correct": 2,
+        "explain": "Parameters a and b receive 3 and 5. The function returns their sum, 8, which is assigned to result and printed."
+      },
+      {
+        "type": "programming",
+        "topic": "early return",
+        "prompt": "What does this code print?\ndef mystery(x):\n    print('Step 1')\n    return x * 2\n    print('Step 2')\n\nprint(mystery(5))",
+        "options": [
+          "Step 1, Step 2, then 10",
+          "Step 1, then 10",
+          "10, then Step 1",
+          "Step 1, then Step 2"
+        ],
+        "correct": 1,
+        "explain": "Step 1 is printed, then return produces 10 and ends the call. Step 2 is unreachable, and the outer print displays 10."
+      },
+      {
+        "type": "programming",
+        "topic": "None return",
+        "prompt": "What happens when this code runs?\ndef double(x):\n    print(x * 2)\n\nresult = double(5) + 3",
+        "options": [
+          "result becomes 13",
+          "result becomes 10",
+          "10 is printed, then TypeError is raised",
+          "Nothing is printed and result becomes None"
+        ],
+        "correct": 2,
+        "explain": "double(5) prints 10 but returns None. Python then attempts None + 3, which raises TypeError."
+      },
+      {
+        "type": "programming",
+        "topic": "parameters and arguments",
+        "prompt": "What does this code print?\ndef calculate(a, b):\n    return a * b\n\nx = 4\nprint(calculate(x + 1, 3))",
+        "options": [
+          "12",
+          "15",
+          "21",
+          "Error"
+        ],
+        "correct": 1,
+        "explain": "The argument x + 1 evaluates to 5, so the function returns 5 * 3, which is 15."
+      },
+      {
+        "type": "programming",
+        "topic": "hierarchical calls",
+        "prompt": "What does this code print?\ndef radius(diameter):\n    return diameter / 2\n\ndef area(diameter):\n    r = radius(diameter)\n    return 3 * r * r\n\nprint(area(4))",
+        "options": [
+          "6.0",
+          "12.0",
+          "24.0",
+          "48.0"
+        ],
+        "correct": 1,
+        "explain": "radius(4) returns 2.0. area() then returns 3 * 2.0 * 2.0, which is 12.0."
+      },
+      {
+        "type": "programming",
+        "topic": "dynamic typing",
+        "prompt": "What does this code print?\ndef repeat(x):\n    return x * 2\n\nprint(repeat(3))\nprint(repeat('Go'))",
+        "options": [
+          "6 followed by GoGo",
+          "33 followed by Go2",
+          "6 followed by an error",
+          "3 followed by Go"
+        ],
+        "correct": 0,
+        "explain": "Integer multiplication gives 6, while multiplying the string by 2 repeats it and gives GoGo."
+      },
+      {
+        "type": "programming",
+        "topic": "branches in functions",
+        "prompt": "What does this code print?\ndef ticket_price(age):\n    if age < 5 or age > 78:\n        return 5\n    elif 17 <= age <= 58:\n        return 28\n    return 16\n\nprint(ticket_price(12))",
+        "options": [
+          "5",
+          "12",
+          "16",
+          "28"
+        ],
+        "correct": 2,
+        "explain": "Age 12 matches neither the first condition nor the 17-through-58 condition, so the final return sends back 16."
+      },
+      {
+        "type": "programming",
+        "topic": "loops in functions",
+        "prompt": "What does this code print?\ndef count_even(values):\n    count = 0\n    for value in values:\n        if value % 2 == 0:\n            count += 1\n    return count\n\nprint(count_even([2, 3, 4, 7, 8]))",
+        "options": [
+          "2",
+          "3",
+          "4",
+          "14"
+        ],
+        "correct": 1,
+        "explain": "The even elements are 2, 4, and 8, so count is increased three times and 3 is returned."
+      },
+      {
+        "type": "programming",
+        "topic": "scope",
+        "prompt": "What does this code print?\nstatus = 'closed'\n\ndef open_store():\n    status = 'open'\n\nopen_store()\nprint(status)",
+        "options": [
+          "open",
+          "closed",
+          "None",
+          "NameError"
+        ],
+        "correct": 1,
+        "explain": "The assignment inside open_store creates a local status. It does not rebind the global status, which remains closed."
+      },
+      {
+        "type": "programming",
+        "topic": "argument mutability",
+        "prompt": "What does this code print?\ndef update(salary, bonuses):\n    salary += 1000\n    bonuses.append(500)\n\npay = 5000\nextras = [1000, 2000]\nupdate(pay, extras)\nprint(pay, extras)",
+        "options": [
+          "6000 [1000, 2000, 500]",
+          "5000 [1000, 2000, 500]",
+          "6000 [1000, 2000]",
+          "5000 [1000, 2000]"
+        ],
+        "correct": 1,
+        "explain": "salary is rebound to a new integer locally, so pay stays 5000. append() mutates the shared list, so extras gains 500."
+      },
+      {
+        "type": "programming",
+        "topic": "keyword arguments",
+        "prompt": "What does this code print?\ndef order(size, topping):\n    print(size, topping)\n\norder(topping='Mushroom', size='Large')",
+        "options": [
+          "Mushroom Large",
+          "Large Mushroom",
+          "Large topping",
+          "SyntaxError"
+        ],
+        "correct": 1,
+        "explain": "Keyword arguments match by parameter name rather than order, so size receives Large and topping receives Mushroom."
+      },
+      {
+        "type": "programming",
+        "topic": "default parameters",
+        "prompt": "What does this code print?\ndef salary(base=3000, bonus=500):\n    return base + bonus\n\nprint(salary(4000))\nprint(salary())",
+        "options": [
+          "4000 then 3000",
+          "4500 then 3500",
+          "4500 then 3000",
+          "5000 then 3500"
+        ],
+        "correct": 1,
+        "explain": "The first call uses base 4000 and default bonus 500. The second uses both defaults, giving 3500."
+      },
+      {
+        "type": "programming",
+        "topic": "arbitrary arguments",
+        "prompt": "What does this code print?\ndef total(base, *extras):\n    print(extras)\n    return base + sum(extras)\n\nprint(total(10, 2, 3))",
+        "options": [
+          "[2, 3] then 15",
+          "(2, 3) then 15",
+          "(10, 2, 3) then 15",
+          "(2, 3) then 6"
+        ],
+        "correct": 1,
+        "explain": "*extras collects the additional positional arguments into the tuple (2, 3). Adding them to base returns 15."
+      },
+      {
+        "type": "programming",
+        "topic": "multiple outputs",
+        "prompt": "What does this code print?\ndef get_stats():\n    return 80, 5\n\naverage, deviation = get_stats()\nprint(average + deviation)",
+        "options": [
+          "(80, 5)",
+          "805",
+          "85",
+          "ValueError"
+        ],
+        "correct": 2,
+        "explain": "The returned tuple is unpacked into average and deviation. Adding 80 and 5 produces 85."
+      },
+      {
+        "type": "logic",
+        "topic": "definition and execution",
+        "prompt": "Which statement correctly describes defining and calling a function?",
+        "options": [
+          "A def statement always executes the body immediately",
+          "Defining creates the function; calling it executes its body",
+          "A function can be called only inside another function",
+          "Every function must print a value"
+        ],
+        "correct": 1,
+        "explain": "The def statement creates and binds the function object. Its body runs only when the function is called."
+      },
+      {
+        "type": "logic",
+        "topic": "parameters and arguments",
+        "prompt": "Which description correctly distinguishes a parameter from an argument?",
+        "options": [
+          "A parameter appears in the definition; an argument is supplied in a call",
+          "A parameter is always numeric; an argument is always text",
+          "An argument appears only in return statements",
+          "They are unrelated to function inputs"
+        ],
+        "correct": 0,
+        "explain": "Parameters are the input names declared by the function, while arguments are the actual values or expressions supplied by the caller."
+      },
+      {
+        "type": "logic",
+        "topic": "pass-by-assignment",
+        "prompt": "Which statement best describes Python's function argument behavior?",
+        "options": [
+          "Every argument is copied deeply before a call",
+          "Parameters are bound to the passed objects; mutation may be visible, while rebinding a parameter is local",
+          "A function can never affect a list supplied by its caller",
+          "Assigning to any parameter automatically changes the caller's variable"
+        ],
+        "correct": 1,
+        "explain": "Python binds parameters to the supplied objects. Mutating a shared mutable object can be observed by the caller, but rebinding the local parameter does not rebind the caller's name."
+      },
+      {
+        "type": "logic",
+        "topic": "argument rules",
+        "prompt": "Which rule about function arguments is correct?",
+        "options": [
+          "Positional arguments may follow keyword arguments in the same call",
+          "Keyword arguments must follow the definition's written order",
+          "Positional arguments must come before keyword arguments in a call",
+          "Every parameter must have a default"
+        ],
+        "correct": 2,
+        "explain": "Python requires positional arguments before keyword arguments. Keyword arguments can then be ordered by name."
+      },
+      {
+        "type": "logic",
+        "topic": "stubs and documentation",
+        "prompt": "Which pairing is correct?",
+        "options": [
+          "pass documents a function for help(), while a docstring raises an error",
+          "NotImplementedError signals unfinished behavior, while a docstring documents purpose and use",
+          "A docstring collects extra positional arguments, while *args creates documentation",
+          "help() completes an unfinished function body"
+        ],
+        "correct": 1,
+        "explain": "Raising NotImplementedError makes unfinished behavior explicit. A docstring records documentation that tools such as help() can display."
+      }
     ]
   },
   {
@@ -962,150 +2183,59 @@ const MODULES = [
     "questions": [
       {
         "type": "programming",
-        "topic": "slicing with stride",
-        "prompt": "What does this code print?\ntext = 'Programming'\nprint(text[1:-2:2])",
+        "topic": "slicing",
+        "prompt": "What does this code print?\nstring1 = 'Google'\nstring2 = 'Wikipedia'\nprint(string1[3:-1] + string2[1:-3:2])",
         "options": [
-          "rgam",
-          "roamn",
-          "rorm",
-          "ogram"
+          "gliie",
+          "gliki",
+          "gleia",
+          "googie"
         ],
         "correct": 0,
-        "explain": "The slice starts at index 1, stops before index -2, and takes every second character, producing rgam."
+        "explain": "string1[3:-1] is gl. string2[1:-3:2] selects indexes 1, 3, and 5, giving iie. Together they produce gliie."
       },
       {
         "type": "programming",
-        "topic": "negative indexing and stride",
-        "prompt": "What does this code print?\ntext = 'Wikipedia'\nprint(text[1:-2:2])",
+        "topic": "omitted slice bounds",
+        "prompt": "What does this code print?\ntext = 'en.wikipedia'\nprint(text[:5] + '|' + text[2:])",
         "options": [
-          "iie",
-          "ikpd",
-          "iea",
-          "ikip"
+          "en.wi|.wikipedia",
+          "en.w|wikipedia",
+          "en.wik|.wikipedia",
+          "en.wi|wikipedia"
         ],
         "correct": 0,
-        "explain": "The selected positions are 1, 3, and 5, which contain i, i, and e."
-      },
-      {
-        "type": "programming",
-        "topic": "designing a slice",
-        "prompt": "Given text = 'Programming', which expression produces 'gram'?",
-        "options": [
-          "text[2:6]",
-          "text[3:7]",
-          "text[3:6]",
-          "text[4:8]"
-        ],
-        "correct": 1,
-        "explain": "Indices 3 through 6 contain g, r, a, and m. The stop index 7 is excluded."
+        "explain": "text[:5] starts at the first character and stops before index 5, giving en.wi. text[2:] starts at index 2 and continues to the end, giving .wikipedia."
       },
       {
         "type": "programming",
         "topic": "immutability and reassignment",
-        "prompt": "What does this code print?\noriginal = 'abcdef'\npart = original[1:5]\noriginal = original.replace('c', 'X')\nprint(part, original)",
+        "prompt": "What does this code print?\noriginal_string = 'Hello World'\nslice_string = original_string[1:-3]\noriginal_string = 'Hi World'\nprint(slice_string)",
         "options": [
-          "bXde abXdef",
-          "bcde abXdef",
-          "bcde abcdef",
-          "bXde abcdef"
-        ],
-        "correct": 1,
-        "explain": "part was created before original was reassigned, so part remains bcde while original becomes abXdef."
-      },
-      {
-        "type": "programming",
-        "topic": "replace and count",
-        "prompt": "What does this code print?\ntext = 'Python Python Python'\nnew_text = text.replace('Python', 'Java', 2)\nprint(new_text.count('Python'))",
-        "options": [
-          "0",
-          "1",
-          "2",
-          "3"
-        ],
-        "correct": 1,
-        "explain": "Only the first two occurrences are replaced, so one Python remains."
-      },
-      {
-        "type": "programming",
-        "topic": "find with boundaries",
-        "prompt": "What does this code print?\ntext = 'banana bandana'\nprint(text.find('ana', 2, 8))",
-        "options": [
-          "1",
-          "3",
-          "8",
-          "-1"
-        ],
-        "correct": 1,
-        "explain": "The search begins at index 2 and stops before index 8. The first ana within that search range begins at index 3."
-      },
-      {
-        "type": "programming",
-        "topic": "rfind",
-        "prompt": "What does this code print?\ntext = 'banana bandana'\nprint(text.rfind('ana'))",
-        "options": [
-          "3",
-          "8",
-          "11",
-          "-1"
-        ],
-        "correct": 2,
-        "explain": "rfind() returns the starting index of the last occurrence. The final ana begins at index 11."
-      },
-      {
-        "type": "programming",
-        "topic": "split with explicit separator",
-        "prompt": "What does this code print?\ntext = 'a  b   c'\nprint(text.split(' '))",
-        "options": [
-          "['a', 'b', 'c']",
-          "['a', '', 'b', '', '', 'c']",
-          "['a  b   c']",
-          "['a', ' ', 'b', ' ', 'c']"
-        ],
-        "correct": 1,
-        "explain": "Using one explicit space as the separator preserves empty strings created by repeated spaces."
-      },
-      {
-        "type": "programming",
-        "topic": "split and join",
-        "prompt": "What does this code print?\ntext = 'a  b   c'\nparts = text.split()\nprint(':'.join(parts))",
-        "options": [
-          "a::b:::c",
-          "a:b:c",
-          "a b c",
-          "['a', 'b', 'c']"
-        ],
-        "correct": 1,
-        "explain": "split() without an explicit separator ignores extra whitespace, producing three tokens. join() inserts one colon between them."
-      },
-      {
-        "type": "programming",
-        "topic": "method chaining",
-        "prompt": "Which expression converts '  mcGILL university  ' into 'Mcgill University'?",
-        "options": [
-          "text.strip().lower().title()",
-          "text.lower().strip()",
-          "text.title().lower().strip()",
-          "text.strip().upper().title()"
+          "ello Wo",
+          "i Wo",
+          "Hi World",
+          "ello W"
         ],
         "correct": 0,
-        "explain": "strip() removes surrounding spaces, lower() normalizes the case, and title() capitalizes each word."
+        "explain": "The slice was already created as a new string. Reassigning original_string later does not change slice_string, so it remains ello Wo."
       },
       {
         "type": "programming",
-        "topic": "formatting with fill",
-        "prompt": "What does this code print?\nword = 'Hi'\nprint(f'{word:*^8}')",
+        "topic": "stride",
+        "prompt": "What does this code print?\ntext = 'Wikipedia'\nprint(text[1:-3:2])",
         "options": [
-          "***Hi***",
-          "**Hi****",
-          "Hi******",
-          "******Hi"
+          "iie",
+          "ikip",
+          "ikpd",
+          "iea"
         ],
         "correct": 0,
-        "explain": "Hi uses 2 positions in a width of 8, leaving 6 padding positions. Center alignment places 3 asterisks on each side."
+        "explain": "The slice starts at index 1, stops before index -3, and moves by 2. It selects indexes 1, 3, and 5: i, i, and e."
       },
       {
         "type": "programming",
-        "topic": "minimum field width",
+        "topic": "field width",
         "prompt": "What does this code print?\nword = 'Python'\nprint(f'|{word:4}|')",
         "options": [
           "|Pyth|",
@@ -1114,111 +2244,202 @@ const MODULES = [
           "|Python  |"
         ],
         "correct": 1,
-        "explain": "Field width is a minimum, not a maximum. A six-character value is not truncated to fit width 4."
+        "explain": "Field width is a minimum width. Python already has 6 characters, so width 4 does not truncate it."
       },
       {
         "type": "programming",
-        "topic": "choosing a format specification",
-        "prompt": "Which expression displays Data as ___Data___?",
+        "topic": "alignment",
+        "prompt": "What does this code print?\nword = 'Hi'\nprint(f'|{word:>5}|')",
         "options": [
-          "f'{word:_<10}'",
-          "f'{word:_>10}'",
-          "f'{word:_^10}'",
-          "f'{word:^_10}'"
-        ],
-        "correct": 2,
-        "explain": "The fill character _ comes before the center-alignment symbol ^, and width 10 leaves three underscores on each side of Data."
-      },
-      {
-        "type": "programming",
-        "topic": "split and join pipeline",
-        "prompt": "Given email = 'caius.palomo@mail.mcgill.ca', which code produces 'caius palomo'?",
-        "options": [
-          "' '.join(email.split('@'))",
-          "' '.join(email.split('@')[0].split('.'))",
-          "'.'.join(email.split('@')[0].split('.'))",
-          "email.split('.')[0]"
+          "|Hi   |",
+          "|   Hi|",
+          "| Hi  |",
+          "|Hi|"
         ],
         "correct": 1,
-        "explain": "The text before @ is caius.palomo. Splitting that at the period creates two name parts, and joining them with a space produces caius palomo."
+        "explain": "The > alignment character right-aligns the string within width 5, so three spaces appear before Hi."
       },
       {
         "type": "programming",
-        "topic": "replace followed by count",
-        "prompt": "What does this code print?\ntext = 'banana'\nchanged = text.replace('a', 'o', 2)\nprint(changed.count('o'))",
+        "topic": "fill and center alignment",
+        "prompt": "What does this code print?\nsymbol = '@'\nprint(f'{symbol:*^11}')",
+        "options": [
+          "*****@*****",
+          "@**********",
+          "**********@",
+          "****@******"
+        ],
+        "correct": 0,
+        "explain": "* is the fill character, ^ centers the value, and 11 is the total field width. Five asterisks appear on each side of @."
+      },
+      {
+        "type": "programming",
+        "topic": "replace and count",
+        "prompt": "What does this code print?\ns = 'Python is fun, Python is powerful. But I like Python.'\nnew_s = s.replace('Python', 'Java', 1)\nprint(new_s.count('Python'))",
+        "options": [
+          "0",
+          "1",
+          "2",
+          "3"
+        ],
+        "correct": 2,
+        "explain": "replace(..., 1) changes only the first Python to Java. Two occurrences of Python remain, so count() returns 2."
+      },
+      {
+        "type": "programming",
+        "topic": "find",
+        "prompt": "What does this code print?\ntext = 'Python'\nprint(text.find('Java'))",
+        "options": [
+          "0",
+          "-1",
+          "None",
+          "False"
+        ],
+        "correct": 1,
+        "explain": "find() returns -1 when the requested substring is not found."
+      },
+      {
+        "type": "programming",
+        "topic": "find with start and end",
+        "prompt": "What does this code print?\ntext = 'banana'\nprint(text.find('ana', 2, 6))",
         "options": [
           "1",
           "2",
           "3",
-          "4"
+          "-1"
+        ],
+        "correct": 2,
+        "explain": "The search begins at index 2 and stops before index 6. The matching ana within that range begins at index 3."
+      },
+      {
+        "type": "programming",
+        "topic": "rfind",
+        "prompt": "What does this code print?\ntext = 'banana'\nprint(text.rfind('ana'))",
+        "options": [
+          "1",
+          "2",
+          "3",
+          "-1"
+        ],
+        "correct": 2,
+        "explain": "rfind() returns the starting index of the last occurrence. In banana, the final ana starts at index 3."
+      },
+      {
+        "type": "programming",
+        "topic": "string transformation",
+        "prompt": "What does this code print?\nname = '  BOB  '\nprint(name.strip().lower())",
+        "options": [
+          "BOB",
+          "bob",
+          "  bob  ",
+          "Bob"
         ],
         "correct": 1,
-        "explain": "Only the first two a characters are replaced by o, so the resulting string contains two o characters."
+        "explain": "strip() removes the surrounding whitespace, and lower() converts the remaining letters to lowercase."
+      },
+      {
+        "type": "programming",
+        "topic": "string checks",
+        "prompt": "What does this code print?\ntext = 'ABC'\nprint(text.isupper(), text.islower())",
+        "options": [
+          "True True",
+          "True False",
+          "False True",
+          "False False"
+        ],
+        "correct": 1,
+        "explain": "ABC is uppercase, so isupper() is True. It is not lowercase, so islower() is False."
+      },
+      {
+        "type": "programming",
+        "topic": "split with separator",
+        "prompt": "What does this code print?\ntext = 'Hello   World'\nprint(text.split(' '))",
+        "options": [
+          "['Hello', 'World']",
+          "['Hello', '', '', 'World']",
+          "['Hello   World']",
+          "['Hello', ' ', ' ', 'World']"
+        ],
+        "correct": 1,
+        "explain": "With an explicit single-space separator, the repeated spaces create empty string tokens between Hello and World."
+      },
+      {
+        "type": "programming",
+        "topic": "split and join",
+        "prompt": "What does this code print?\ne_address = 'caius.palomo@mail.mcgill.ca'\nsplit1 = e_address.split('@')\nraw_name = split1[0]\nsplit2 = raw_name.split('.')\nprint(' '.join(split2))",
+        "options": [
+          "caius.palomo",
+          "caius palomo",
+          "caius@palomo",
+          "['caius', 'palomo']"
+        ],
+        "correct": 1,
+        "explain": "The first split keeps caius.palomo before @. Splitting that at the period gives caius and palomo, and join() places one space between them."
       },
       {
         "type": "logic",
         "topic": "slice boundaries",
-        "prompt": "A student wants characters at indexes 2, 3, 4, and 5. Which slice correctly follows Python's start and stop rules?",
+        "prompt": "Which statement correctly describes text[start:end]?",
         "options": [
-          "text[2:5]",
-          "text[2:6]",
-          "text[1:5]",
-          "text[3:6]"
+          "It includes both start and end",
+          "It includes start and stops at end - 1",
+          "It begins at start + 1 and includes end",
+          "It always uses positive indexes only"
         ],
         "correct": 1,
-        "explain": "The start index is included and the stop index is excluded, so stop must be 6 to include index 5."
+        "explain": "String slicing includes the start index and excludes the end index, so the last included position is end - 1."
       },
       {
         "type": "logic",
-        "topic": "immutability",
-        "prompt": "A slice is stored in piece, and the original string variable is later reassigned. Which statement best explains why piece does not change?",
+        "topic": "string immutability",
+        "prompt": "Why does a previously created string slice stay unchanged after the original variable is reassigned?",
         "options": [
-          "Slices automatically track the newest value of the original variable",
-          "A slice creates a separate string object before the later reassignment",
-          "Reassignment edits every string object that shares characters",
-          "Strings become mutable after slicing"
+          "The slice automatically updates later",
+          "The slice is a new string object created before the reassignment",
+          "Strings become mutable after slicing",
+          "Reassignment edits both string objects"
         ],
         "correct": 1,
-        "explain": "Slicing creates a new string object. Reassigning the original variable changes what that variable refers to, not the already-created slice."
+        "explain": "Slicing creates a new string object. Reassignment changes which object the original variable name refers to, not the already-created slice."
       },
       {
         "type": "logic",
-        "topic": "field width",
-        "prompt": "A string has 7 characters and is formatted with width 4. What should you expect?",
+        "topic": "format alignment",
+        "prompt": "Which mapping of alignment symbols is correct?",
         "options": [
-          "The string is truncated to 4 characters",
-          "Python raises an error",
-          "The full 7-character string is displayed",
-          "Only the first 4 characters are aligned"
+          "< right, > left, ^ center",
+          "< left, > right, ^ center",
+          "< center, > right, ^ left",
+          "< left, > center, ^ right"
         ],
-        "correct": 2,
-        "explain": "Field width specifies a minimum display width. If the value is already wider, Python displays the full value."
+        "correct": 1,
+        "explain": "The slides define < as left-aligned, > as right-aligned, and ^ as centered."
       },
       {
         "type": "logic",
-        "topic": "split semantics",
-        "prompt": "Why can split(' ') and split() produce different results for text containing repeated spaces?",
+        "topic": "split behavior",
+        "prompt": "Which statement matches the slide example using 'Hello   World'?",
         "options": [
-          "split(' ') treats every single space as a separator and can create empty tokens",
-          "split() always keeps every space as a token",
-          "split(' ') removes repeated spaces before splitting",
-          "split() converts the result back to a string"
+          "split(' ') and split() always return the same list",
+          "split(' ') can preserve empty strings, while split() ignores extra whitespace between words",
+          "split() preserves every individual space as an empty token",
+          "split(' ') joins words instead of splitting them"
+        ],
+        "correct": 1,
+        "explain": "The slide shows split(' ') producing empty tokens for repeated spaces, while split() returns only Hello and World."
+      },
+      {
+        "type": "logic",
+        "topic": "string checks",
+        "prompt": "Which three methods match the slide's password checks for all uppercase letters, all lowercase letters, and all digits?",
+        "options": [
+          "isupper(), islower(), isdigit()",
+          "upper(), lower(), count()",
+          "find(), replace(), split()",
+          "strip(), title(), join()"
         ],
         "correct": 0,
-        "explain": "With an explicit single-space separator, each separator is processed individually, so adjacent spaces can create empty strings. split() groups whitespace."
-      },
-      {
-        "type": "logic",
-        "topic": "find versus count",
-        "prompt": "If substring x does not appear in text, which pair of results is consistent with find(x) and count(x)?",
-        "options": [
-          "find(x) = 0, count(x) = -1",
-          "find(x) = -1, count(x) = 0",
-          "find(x) = None, count(x) = 0",
-          "find(x) = False, count(x) = -1"
-        ],
-        "correct": 1,
-        "explain": "find() uses -1 to indicate no match, while count() reports zero occurrences."
+        "explain": "The password example uses isupper() and islower(), and the missing digit check is completed with isdigit()."
       }
     ]
   }
@@ -1305,7 +2526,7 @@ function openModule(m){
   quizTitle.textContent = `Week ${MODULES.indexOf(m) + 1}: ${m.title}`;
   scoreLine.classList.remove('show');
   gradeBtn.disabled = true;
-  gradeHint.textContent = 'Answer all questions to unlock grading and explanations.';
+  gradeHint.textContent = 'Choose an answer to see feedback immediately.';
   renderQuiz();
   modulesRoot.classList.add('hide');
   quizView.classList.add('show');
@@ -1322,21 +2543,40 @@ function updateProgress(){
   const answered = answers.filter(a => a !== null).length;
   const total = currentModule.questions.length;
   const remaining = total - answered;
-  quizProgress.innerHTML = `<strong>${answered} of ${total}</strong> answered${remaining > 0 ? ` &nbsp;·&nbsp; ${remaining} remaining` : ' &nbsp;·&nbsp; Ready to submit'}`;
-  gradeBtn.disabled = remaining !== 0 || graded;
-  if (!graded) {
-    gradeHint.textContent = remaining === 0
-      ? 'All questions are answered. You can now submit and review the explanations.'
-      : `Complete the remaining ${remaining} question${remaining === 1 ? '' : 's'} before solutions can be shown.`;
+  const score = currentModule.questions.reduce((sum, q, qi) => sum + (answers[qi] === q.correct ? 1 : 0), 0);
+  quizProgress.innerHTML = `<strong>${answered} of ${total}</strong> answered${remaining > 0 ? ` &nbsp;·&nbsp; ${remaining} remaining` : ' &nbsp;·&nbsp; Practice complete'}`;
+  gradeBtn.disabled = true;
+
+  if (remaining === 0) {
+    graded = true;
+    scoreScore.textContent = `${score}/${total}`;
+    scoreMsg.textContent = score === total
+      ? 'Excellent work. Every answer is correct.'
+      : 'Practice complete. Review the explanations above and revisit any concepts that were difficult.';
+    gradeHint.textContent = 'Practice complete. Your final score is shown below.';
+    scoreLine.classList.add('show');
+  } else {
+    gradeHint.textContent = 'Feedback appears immediately after each answer. Complete all questions to see your final score.';
   }
 }
 
-function clearFeedback(qi){
-  if (!graded) return;
+function showQuestionFeedback(qi, chosen){
+  const q = currentModule.questions[qi];
+  const isRight = chosen === q.correct;
+
+  document.querySelectorAll(`.option[data-qi="${qi}"]`).forEach(optEl => {
+    const oi = Number(optEl.dataset.oi);
+    const input = optEl.querySelector('input');
+    input.disabled = true;
+    if (oi === q.correct) optEl.classList.add('is-correct');
+    else if (oi === chosen) optEl.classList.add('is-wrong');
+  });
+
   const fb = document.getElementById('feedback-' + qi);
-  fb.classList.remove('show');
-  fb.innerHTML = '';
-  document.querySelectorAll(`.option[data-qi="${qi}"]`).forEach(o => o.classList.remove('is-correct','is-wrong'));
+  fb.innerHTML = isRight
+    ? `<span class="verdict right">Correct</span>${escapeHtml(q.explain)}`
+    : `<span class="verdict wrong">Review</span>${escapeHtml(q.explain)}`;
+  fb.classList.add('show');
 }
 
 function renderQuiz(){
@@ -1377,8 +2617,9 @@ function renderQuiz(){
       input.name = 'q' + qi;
       input.value = oi;
       input.addEventListener('change', () => {
-        if (graded) return;
+        if (answers[qi] !== null) return;
         answers[qi] = oi;
+        showQuestionFeedback(qi, oi);
         updateProgress();
       });
       const span = document.createElement('span');
@@ -1404,49 +2645,37 @@ function renderQuiz(){
   updateProgress();
 }
 
-gradeBtn.addEventListener('click', () => {
-  if (answers.some(a => a === null)) {
-    updateProgress();
-    return;
+function initPracticeMotivation(){
+  const heartBtn = document.getElementById('heart-btn');
+  const achievement = document.getElementById('achievement');
+  const visitNote = document.getElementById('visit-note');
+
+  if (heartBtn && achievement) {
+    let wins = Number(localStorage.getItem('mgcr233PracticeWins') || 0);
+    heartBtn.addEventListener('click', () => {
+      wins += 1;
+      localStorage.setItem('mgcr233PracticeWins', String(wins));
+      heartBtn.classList.remove('celebrate');
+      void heartBtn.offsetWidth;
+      heartBtn.classList.add('celebrate');
+      achievement.textContent = `★ Nice work! ${wins} practice win${wins === 1 ? '' : 's'}`;
+      achievement.classList.add('show');
+      window.setTimeout(() => achievement.classList.remove('show'), 2200);
+    });
   }
 
-  graded = true;
-  gradeBtn.disabled = true;
-  let score = 0;
-
-  currentModule.questions.forEach((q, qi) => {
-    const chosen = answers[qi];
-    const isRight = chosen === q.correct;
-    if (isRight) score++;
-
-    document.querySelectorAll(`.option[data-qi="${qi}"]`).forEach(optEl => {
-      const oi = Number(optEl.dataset.oi);
-      const input = optEl.querySelector('input');
-      input.disabled = true;
-      if (oi === q.correct) optEl.classList.add('is-correct');
-      else if (oi === chosen) optEl.classList.add('is-wrong');
-    });
-
-    const fb = document.getElementById('feedback-' + qi);
-    fb.innerHTML = isRight
-      ? `<span class="verdict right">Correct</span>${escapeHtml(q.explain)}`
-      : `<span class="verdict wrong">Review</span>${escapeHtml(q.explain)}`;
-    fb.classList.add('show');
-  });
-
-  scoreScore.textContent = `${score}/${currentModule.questions.length}`;
-  scoreMsg.textContent = score === currentModule.questions.length
-    ? 'Excellent work. Every answer is correct.'
-    : 'Review the explanations below each question and focus on the reasoning behind the marked items.';
-  gradeHint.textContent = 'Grading is complete. Explanations are now visible.';
-  scoreLine.classList.add('show');
-  scoreLine.scrollIntoView({behavior:'smooth',block:'nearest'});
-});
+  if (visitNote) {
+    let visits = Number(localStorage.getItem('mgcr233PracticeVisits') || 0) + 1;
+    localStorage.setItem('mgcr233PracticeVisits', String(visits));
+    visitNote.textContent = `This is your ${visits}${visits === 1 ? 'st' : visits === 2 ? 'nd' : visits === 3 ? 'rd' : 'th'} practice visit on this browser. Keep working!`;
+  }
+}
 
 document.getElementById('back-btn').addEventListener('click', closeModule);
 renderModuleList();
 renderStudyTabs();
 renderStudyMaterials();
+initPracticeMotivation();
 </script>
 </body>
 </html>
