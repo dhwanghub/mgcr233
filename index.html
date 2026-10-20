@@ -46,15 +46,19 @@
   .info-item .v{font-size:14px;font-weight:500;}
   .info-item .v a{color:var(--red);text-decoration:none;}
   .info-item .v a:hover{text-decoration:underline;}
-  .practice-cheer{margin-top:2px;padding-top:2px;}
-  .practice-cheer .cheer-label{font-size:12px;color:var(--gray-light);margin-bottom:7px;}
-  .checkin-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
-  .checkin-input{width:210px;max-width:100%;border:1px solid var(--line);border-radius:4px;padding:7px 9px;font:inherit;font-size:12px;color:var(--black);background:var(--paper);}
-  .checkin-input:focus{outline:none;border-color:var(--red);}
-  .checkin-btn{border:1px solid var(--red);border-radius:4px;background:var(--paper);color:var(--red);padding:7px 10px;font-size:11.5px;font-weight:700;cursor:pointer;transition:background .15s ease,color .15s ease;}
-  .checkin-btn:hover{background:var(--soft-red);}
-  .checkin-status{font-size:11.5px;color:var(--correct-line);margin-top:6px;min-height:18px;}
-  .checkin-note{font-size:10.5px;color:var(--gray-light);margin-top:3px;line-height:1.4;}
+  .practice-note{margin-top:4px;padding-top:2px;}
+  .practice-note-title{font-size:12px;font-weight:700;color:var(--black);margin-bottom:3px;}
+  .practice-note-sub{font-size:10.5px;color:var(--gray-light);margin-bottom:8px;line-height:1.4;}
+  .practice-note-message{width:100%;border:1px solid var(--line);border-radius:4px;padding:8px 9px;font:inherit;font-size:12px;color:var(--black);background:var(--paper);min-height:62px;resize:vertical;margin-bottom:6px;}
+  .practice-note-message:focus{outline:none;border-color:var(--red);}
+  .practice-note-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
+  .practice-note-btn{border:1px solid var(--red);border-radius:4px;background:var(--paper);color:var(--red);padding:7px 10px;font-size:11.5px;font-weight:700;cursor:pointer;}
+  .practice-note-btn:hover{background:var(--soft-red);}
+  .practice-note-status{font-size:10.5px;color:var(--correct-line);min-height:17px;margin-top:4px;}
+  .saved-notes{margin-top:9px;border-top:1px solid var(--line);padding-top:7px;display:grid;gap:7px;max-height:190px;overflow-y:auto;}
+  .saved-note{font-size:11px;color:var(--gray);line-height:1.4;padding-bottom:7px;border-bottom:1px solid var(--line);}
+  .saved-note:last-child{border-bottom:0;padding-bottom:0;}
+  .saved-note-date{font-size:9.5px;color:var(--gray-light);margin-bottom:2px;}
   .visit-note{font-size:11.5px;color:var(--gray-light);margin-top:6px;min-height:18px;}
 
   .study{padding:36px 0 16px;}
@@ -167,14 +171,15 @@
         <div class="info-support">
           <div class="info-item"><div class="k">Need help?</div><div class="v"><a href="mailto:dugmee.hwang@mcgill.ca">dugmee.hwang@mcgill.ca</a></div></div>
           <div class="info-item"><div class="k">Discussion needed?</div><div class="v"><a href="https://mycourses2.mcgill.ca/d2l/le/879465/discussions/List" target="_blank" rel="noopener noreferrer">myCourses Discussion Board</a></div></div>
-          <div class="practice-cheer">
-            <div class="cheer-label">Share your email! I’ll keep in mind that you’re working hard.</div>
-            <div class="checkin-row">
-              <input class="checkin-input" id="practice-email" type="email" placeholder="your.email@mcgill.ca" autocomplete="email" aria-label="Your email">
-              <button class="checkin-btn" id="practice-email-btn" type="button">Send check-in</button>
+          <div class="practice-note">
+            <div class="practice-note-title">Practice Note</div>
+            <div class="practice-note-sub">What did you work on today? Save a quick note for yourself. It stays only on this browser.</div>
+            <textarea class="practice-note-message" id="practice-note-message" maxlength="280" placeholder="e.g., Practiced Week 7 slicing today!" aria-label="Practice note"></textarea>
+            <div class="practice-note-row">
+              <button class="practice-note-btn" id="practice-note-save" type="button">Save note</button>
+              <span class="practice-note-status" id="practice-note-status"></span>
             </div>
-            <div class="checkin-status" id="checkin-status"></div>
-            <div class="checkin-note">This opens your email app with a message to dugmee.hwang@mcgill.ca. Your address is not stored by this site.</div>
+            <div class="saved-notes" id="saved-notes"></div>
             <div class="visit-note" id="visit-note">Keep going. Every practice session counts.</div>
           </div>
         </div>
@@ -189,14 +194,17 @@
         </div>
       </div>
       <div class="study-tabs" id="study-tabs"></div>
-      <div class="study-block">
-        <div class="study-label"><h3>Concept Flash Cards</h3><span>Core ideas to remember</span></div>
-        <div class="concept-grid" id="concept-grid"></div>
+      <div id="study-content">
+        <div class="study-block">
+          <div class="study-label"><h3>Concept Flash Cards</h3><span>Core ideas to remember</span></div>
+          <div class="concept-grid" id="concept-grid"></div>
+        </div>
+        <div class="study-block">
+          <div class="study-label"><h3>Practice Examples</h3><span>Worked examples before the quiz</span></div>
+          <div class="example-list" id="example-list"></div>
+        </div>
       </div>
-      <div class="study-block">
-        <div class="study-label"><h3>Practice Examples</h3><span>Worked examples before the quiz</span></div>
-        <div class="example-list" id="example-list"></div>
-      </div>
+
     </section>
 
     <section class="modules">
@@ -2645,51 +2653,100 @@ function renderQuiz(){
   updateProgress();
 }
 
-function initPracticeCheckin(){
-  const emailInput = document.getElementById('practice-email');
-  const emailBtn = document.getElementById('practice-email-btn');
-  const status = document.getElementById('checkin-status');
+function ordinal(n){
+  const mod100 = n % 100;
+  if (mod100 >= 11 && mod100 <= 13) return n + 'th';
+  const mod10 = n % 10;
+  return n + (mod10 === 1 ? 'st' : mod10 === 2 ? 'nd' : mod10 === 3 ? 'rd' : 'th');
+}
+
+function formatNoteDate(value){
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return '';
+  return d.toLocaleDateString('en-CA', {month:'short',day:'numeric',year:'numeric'});
+}
+
+function getPracticeNotes(){
+  try {
+    const parsed = JSON.parse(localStorage.getItem('mgcr233PracticeNotes') || '[]');
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function renderPracticeNotes(){
+  const list = document.getElementById('saved-notes');
+  if (!list) return;
+  const notes = getPracticeNotes();
+  list.innerHTML = '';
+
+  if (notes.length === 0) {
+    const empty = document.createElement('div');
+    empty.className = 'saved-note';
+    empty.textContent = 'No saved notes yet.';
+    list.appendChild(empty);
+    return;
+  }
+
+  notes.slice(0, 5).forEach(note => {
+    const item = document.createElement('div');
+    item.className = 'saved-note';
+
+    const date = document.createElement('div');
+    date.className = 'saved-note-date';
+    date.textContent = formatNoteDate(note.createdAt);
+
+    const message = document.createElement('div');
+    message.textContent = note.message;
+
+    item.appendChild(date);
+    item.appendChild(message);
+    list.appendChild(item);
+  });
+}
+
+function savePracticeNote(){
+  const messageInput = document.getElementById('practice-note-message');
+  const status = document.getElementById('practice-note-status');
+  if (!messageInput || !status) return;
+
+  const message = messageInput.value.trim();
+  if (!message) {
+    status.textContent = 'Write a short note first.';
+    messageInput.focus();
+    return;
+  }
+
+  const notes = getPracticeNotes();
+  notes.unshift({message, createdAt:new Date().toISOString()});
+  localStorage.setItem('mgcr233PracticeNotes', JSON.stringify(notes.slice(0, 20)));
+
+  messageInput.value = '';
+  status.textContent = 'Saved on this browser. Nice work today!';
+  renderPracticeNotes();
+}
+
+function initPracticeNote(){
+  const saveBtn = document.getElementById('practice-note-save');
   const visitNote = document.getElementById('visit-note');
 
-  if (emailInput && emailBtn && status) {
-    emailBtn.addEventListener('click', () => {
-      const studentEmail = emailInput.value.trim();
-      if (!studentEmail || !emailInput.checkValidity()) {
-        status.textContent = 'Please enter a valid email address.';
-        emailInput.focus();
-        return;
-      }
-
-      const subject = 'MGCR233 practice check-in';
-      const body = [
-        'Hi Dugmee,',
-        '',
-        'I have been practicing on the MGCR233 practice website.',
-        'My email: ' + studentEmail,
-        '',
-        'Just sharing a quick check-in that I am working on the course material.'
-      ].join('\n');
-
-      const mailto = 'mailto:dugmee.hwang@mcgill.ca?subject=' +
-        encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
-
-      status.textContent = 'Email draft opened. Press Send in your email app to complete the check-in.';
-      window.location.href = mailto;
-    });
-  }
+  if (saveBtn) saveBtn.addEventListener('click', savePracticeNote);
 
   if (visitNote) {
-    let visits = Number(localStorage.getItem('mgcr233PracticeVisits') || 0) + 1;
+    const visits = Number(localStorage.getItem('mgcr233PracticeVisits') || 0) + 1;
     localStorage.setItem('mgcr233PracticeVisits', String(visits));
-    visitNote.textContent = `This is your ${visits}${visits === 1 ? 'st' : visits === 2 ? 'nd' : visits === 3 ? 'rd' : 'th'} practice visit on this browser. Keep working!`;
+    visitNote.textContent = `This is your ${ordinal(visits)} practice visit on this browser. Keep working!`;
   }
+
+  renderPracticeNotes();
 }
 
 document.getElementById('back-btn').addEventListener('click', closeModule);
 renderModuleList();
 renderStudyTabs();
 renderStudyMaterials();
-initPracticeCheckin();
+initPracticeNote();
 </script>
 </body>
 </html>
