@@ -46,6 +46,7 @@
   .info-item .v{font-size:14px;font-weight:500;}
   .info-item .v a{color:var(--red);text-decoration:none;}
   .info-item .v a:hover{text-decoration:underline;}
+  .column-heading{font-size:15px;font-weight:700;color:var(--black);margin-bottom:2px;}
   .practice-note{margin-top:4px;padding-top:2px;}
   .practice-note-title{font-size:12px;font-weight:700;color:var(--black);margin-bottom:3px;}
   .practice-note-sub{font-size:10.5px;color:var(--gray-light);margin-bottom:8px;line-height:1.4;}
@@ -59,6 +60,11 @@
   .saved-note{font-size:11px;color:var(--gray);line-height:1.4;padding-bottom:7px;border-bottom:1px solid var(--line);}
   .saved-note:last-child{border-bottom:0;padding-bottom:0;}
   .saved-note-date{font-size:9.5px;color:var(--gray-light);margin-bottom:2px;}
+  .note-pagination{display:flex;align-items:center;justify-content:flex-end;gap:7px;margin-top:7px;}
+  .note-page-btn{border:1px solid var(--line);background:var(--paper);color:var(--gray);border-radius:4px;padding:4px 7px;font-size:10.5px;cursor:pointer;}
+  .note-page-btn:hover:not(:disabled){border-color:#B9BDC4;color:var(--black);}
+  .note-page-btn:disabled{opacity:.35;cursor:not-allowed;}
+  .note-page-status{font-size:10px;color:var(--gray-light);min-width:36px;text-align:center;}
   .visit-note{font-size:11.5px;color:var(--gray-light);margin-top:6px;min-height:18px;}
 
   .study{padding:36px 0 16px;}
@@ -162,15 +168,14 @@
 <div class="wrap">
   <div id="modules-root" class="modules-root">
     <section class="info">
-      <h2 class="section-title">Course Information</h2>
       <div class="info-grid">
         <div class="info-main">
-          <div class="info-item"><div class="k">Term and year</div><div class="v">Fall 2026</div></div>
+          <div class="column-heading">Course</div>
           <div class="info-item"><div class="k">Course schedule</div><div class="v">Tuesday and Thursday, 8:35 AM to 9:55 AM</div></div>
-        </div>
-        <div class="info-support">
           <div class="info-item"><div class="k">Need help?</div><div class="v"><a href="mailto:dugmee.hwang@mcgill.ca">dugmee.hwang@mcgill.ca</a></div></div>
           <div class="info-item"><div class="k">Discussion needed?</div><div class="v"><a href="https://mycourses2.mcgill.ca/d2l/le/879465/discussions/List" target="_blank" rel="noopener noreferrer">myCourses Discussion Board</a></div></div>
+        </div>
+        <div class="info-support">
           <div class="practice-note">
             <div class="practice-note-title">Practice Note</div>
             <div class="practice-note-sub">What did you work on today? Save a quick note for yourself. It stays only on this browser.</div>
@@ -180,6 +185,11 @@
               <span class="practice-note-status" id="practice-note-status"></span>
             </div>
             <div class="saved-notes" id="saved-notes"></div>
+            <div class="note-pagination" id="note-pagination">
+              <button class="note-page-btn" id="note-prev" type="button">Prev</button>
+              <span class="note-page-status" id="note-page-status">1 / 1</span>
+              <button class="note-page-btn" id="note-next" type="button">Next</button>
+            </div>
             <div class="visit-note" id="visit-note">Keep going. Every practice session counts.</div>
           </div>
         </div>
@@ -2675,9 +2685,17 @@ function getPracticeNotes(){
   }
 }
 
+let practiceNotePage = 0;
+const PRACTICE_NOTES_PER_PAGE = 3;
+
 function renderPracticeNotes(){
   const list = document.getElementById('saved-notes');
+  const pagination = document.getElementById('note-pagination');
+  const prevBtn = document.getElementById('note-prev');
+  const nextBtn = document.getElementById('note-next');
+  const pageStatus = document.getElementById('note-page-status');
   if (!list) return;
+
   const notes = getPracticeNotes();
   list.innerHTML = '';
 
@@ -2686,10 +2704,16 @@ function renderPracticeNotes(){
     empty.className = 'saved-note';
     empty.textContent = 'No saved notes yet.';
     list.appendChild(empty);
+    if (pagination) pagination.style.display = 'none';
     return;
   }
 
-  notes.slice(0, 5).forEach(note => {
+  const totalPages = Math.ceil(notes.length / PRACTICE_NOTES_PER_PAGE);
+  practiceNotePage = Math.min(practiceNotePage, totalPages - 1);
+  const start = practiceNotePage * PRACTICE_NOTES_PER_PAGE;
+  const pageNotes = notes.slice(start, start + PRACTICE_NOTES_PER_PAGE);
+
+  pageNotes.forEach(note => {
     const item = document.createElement('div');
     item.className = 'saved-note';
 
@@ -2704,6 +2728,11 @@ function renderPracticeNotes(){
     item.appendChild(message);
     list.appendChild(item);
   });
+
+  if (pagination) pagination.style.display = totalPages > 1 ? 'flex' : 'none';
+  if (pageStatus) pageStatus.textContent = `${practiceNotePage + 1} / ${totalPages}`;
+  if (prevBtn) prevBtn.disabled = practiceNotePage === 0;
+  if (nextBtn) nextBtn.disabled = practiceNotePage >= totalPages - 1;
 }
 
 function savePracticeNote(){
@@ -2722,6 +2751,7 @@ function savePracticeNote(){
   notes.unshift({message, createdAt:new Date().toISOString()});
   localStorage.setItem('mgcr233PracticeNotes', JSON.stringify(notes.slice(0, 20)));
 
+  practiceNotePage = 0;
   messageInput.value = '';
   status.textContent = 'Saved on this browser. Nice work today!';
   renderPracticeNotes();
@@ -2729,9 +2759,24 @@ function savePracticeNote(){
 
 function initPracticeNote(){
   const saveBtn = document.getElementById('practice-note-save');
+  const prevBtn = document.getElementById('note-prev');
+  const nextBtn = document.getElementById('note-next');
   const visitNote = document.getElementById('visit-note');
 
   if (saveBtn) saveBtn.addEventListener('click', savePracticeNote);
+  if (prevBtn) prevBtn.addEventListener('click', () => {
+    if (practiceNotePage > 0) {
+      practiceNotePage -= 1;
+      renderPracticeNotes();
+    }
+  });
+  if (nextBtn) nextBtn.addEventListener('click', () => {
+    const totalPages = Math.ceil(getPracticeNotes().length / PRACTICE_NOTES_PER_PAGE);
+    if (practiceNotePage < totalPages - 1) {
+      practiceNotePage += 1;
+      renderPracticeNotes();
+    }
+  });
 
   if (visitNote) {
     const visits = Number(localStorage.getItem('mgcr233PracticeVisits') || 0) + 1;
