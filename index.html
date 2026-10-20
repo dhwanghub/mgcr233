@@ -46,22 +46,19 @@
   .info-item .v{font-size:14px;font-weight:500;}
   .info-item .v a{color:var(--red);text-decoration:none;}
   .info-item .v a:hover{text-decoration:underline;}
-  .guestbook{margin-top:4px;padding-top:2px;}
-  .guestbook-title{font-size:12px;font-weight:700;color:var(--black);margin-bottom:3px;}
-  .guestbook-sub{font-size:10.5px;color:var(--gray-light);margin-bottom:8px;line-height:1.4;}
-  .guestbook-input,.guestbook-message{width:100%;border:1px solid var(--line);border-radius:4px;padding:7px 9px;font:inherit;font-size:12px;color:var(--black);background:var(--paper);margin-bottom:6px;}
-  .guestbook-message{min-height:62px;resize:vertical;}
-  .guestbook-input:focus,.guestbook-message:focus{outline:none;border-color:var(--red);}
-  .guestbook-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
-  .guestbook-btn{border:1px solid var(--red);border-radius:4px;background:var(--paper);color:var(--red);padding:7px 10px;font-size:11.5px;font-weight:700;cursor:pointer;}
-  .guestbook-btn:hover{background:var(--soft-red);}
-  .guestbook-btn:disabled{opacity:.45;cursor:not-allowed;}
-  .guestbook-status{font-size:10.5px;color:var(--correct-line);min-height:17px;margin-top:4px;}
-  .guestbook-list{margin-top:9px;border-top:1px solid var(--line);padding-top:7px;display:grid;gap:7px;max-height:220px;overflow-y:auto;}
-  .guestbook-entry{font-size:11px;color:var(--gray);line-height:1.4;padding-bottom:7px;border-bottom:1px solid var(--line);}
-  .guestbook-entry:last-child{border-bottom:0;padding-bottom:0;}
-  .guestbook-meta{display:flex;justify-content:space-between;gap:8px;color:var(--gray-light);font-size:9.5px;margin-bottom:2px;}
-  .guestbook-name{font-weight:700;color:var(--black);}
+  .practice-note{margin-top:4px;padding-top:2px;}
+  .practice-note-title{font-size:12px;font-weight:700;color:var(--black);margin-bottom:3px;}
+  .practice-note-sub{font-size:10.5px;color:var(--gray-light);margin-bottom:8px;line-height:1.4;}
+  .practice-note-message{width:100%;border:1px solid var(--line);border-radius:4px;padding:8px 9px;font:inherit;font-size:12px;color:var(--black);background:var(--paper);min-height:62px;resize:vertical;margin-bottom:6px;}
+  .practice-note-message:focus{outline:none;border-color:var(--red);}
+  .practice-note-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
+  .practice-note-btn{border:1px solid var(--red);border-radius:4px;background:var(--paper);color:var(--red);padding:7px 10px;font-size:11.5px;font-weight:700;cursor:pointer;}
+  .practice-note-btn:hover{background:var(--soft-red);}
+  .practice-note-status{font-size:10.5px;color:var(--correct-line);min-height:17px;margin-top:4px;}
+  .saved-notes{margin-top:9px;border-top:1px solid var(--line);padding-top:7px;display:grid;gap:7px;max-height:190px;overflow-y:auto;}
+  .saved-note{font-size:11px;color:var(--gray);line-height:1.4;padding-bottom:7px;border-bottom:1px solid var(--line);}
+  .saved-note:last-child{border-bottom:0;padding-bottom:0;}
+  .saved-note-date{font-size:9.5px;color:var(--gray-light);margin-bottom:2px;}
   .visit-note{font-size:11.5px;color:var(--gray-light);margin-top:6px;min-height:18px;}
 
   .study{padding:36px 0 16px;}
@@ -174,18 +171,15 @@
         <div class="info-support">
           <div class="info-item"><div class="k">Need help?</div><div class="v"><a href="mailto:dugmee.hwang@mcgill.ca">dugmee.hwang@mcgill.ca</a></div></div>
           <div class="info-item"><div class="k">Discussion needed?</div><div class="v"><a href="https://mycourses2.mcgill.ca/d2l/le/879465/discussions/List" target="_blank" rel="noopener noreferrer">myCourses Discussion Board</a></div></div>
-          <div class="guestbook">
-            <div class="guestbook-title">Practice Guestbook</div>
-            <div class="guestbook-sub">Stopped by to practice? Leave a quick note for the class. Name is optional, and notes are visible to everyone visiting this page.</div>
-            <input class="guestbook-input" id="guestbook-name" type="text" maxlength="60" placeholder="Name (optional)" aria-label="Name, optional">
-            <textarea class="guestbook-message" id="guestbook-message" maxlength="280" placeholder="e.g., Practiced Week 7 today!" aria-label="Guestbook message"></textarea>
-            <div class="guestbook-row">
-              <button class="guestbook-btn" id="guestbook-submit" type="button">Leave a note</button>
-              <span class="guestbook-status" id="guestbook-status"></span>
+          <div class="practice-note">
+            <div class="practice-note-title">Practice Note</div>
+            <div class="practice-note-sub">What did you work on today? Save a quick note for yourself. It stays only on this browser.</div>
+            <textarea class="practice-note-message" id="practice-note-message" maxlength="280" placeholder="e.g., Practiced Week 7 slicing today!" aria-label="Practice note"></textarea>
+            <div class="practice-note-row">
+              <button class="practice-note-btn" id="practice-note-save" type="button">Save note</button>
+              <span class="practice-note-status" id="practice-note-status"></span>
             </div>
-            <div class="guestbook-list" id="guestbook-list">
-              <div class="guestbook-entry">Guestbook is loading...</div>
-            </div>
+            <div class="saved-notes" id="saved-notes"></div>
             <div class="visit-note" id="visit-note">Keep going. Every practice session counts.</div>
           </div>
         </div>
@@ -243,8 +237,6 @@
   <footer>MGCR 233 practice activities &middot; based on weekly course material</footer>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="site-config.js"></script>
 <script>
 const MODULES = [
   {
@@ -2480,24 +2472,6 @@ let currentModule = null;
 let currentStudyModule = MODULES[0];
 let answers = [];
 let graded = false;
-let supabaseClient = null;
-
-const SITE_CONFIG = window.MGCR233_CONFIG || {};
-const SUPABASE_READY = Boolean(
-  window.supabase &&
-  SITE_CONFIG.supabaseUrl &&
-  SITE_CONFIG.supabasePublishableKey &&
-  !String(SITE_CONFIG.supabaseUrl).includes('YOUR_') &&
-  !String(SITE_CONFIG.supabasePublishableKey).includes('YOUR_')
-);
-
-if (SUPABASE_READY) {
-  supabaseClient = window.supabase.createClient(
-    SITE_CONFIG.supabaseUrl,
-    SITE_CONFIG.supabasePublishableKey,
-    {auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}}
-  );
-}
 
 function escapeHtml(str){
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -2686,120 +2660,78 @@ function ordinal(n){
   return n + (mod10 === 1 ? 'st' : mod10 === 2 ? 'nd' : mod10 === 3 ? 'rd' : 'th');
 }
 
-function formatGuestbookDate(value){
+function formatNoteDate(value){
   const d = new Date(value);
   if (Number.isNaN(d.getTime())) return '';
-  return d.toLocaleDateString('en-CA', {month:'short',day:'numeric'});
+  return d.toLocaleDateString('en-CA', {month:'short',day:'numeric',year:'numeric'});
 }
 
-function renderGuestbook(entries){
-  const list = document.getElementById('guestbook-list');
+function getPracticeNotes(){
+  try {
+    const parsed = JSON.parse(localStorage.getItem('mgcr233PracticeNotes') || '[]');
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function renderPracticeNotes(){
+  const list = document.getElementById('saved-notes');
   if (!list) return;
+  const notes = getPracticeNotes();
   list.innerHTML = '';
 
-  if (!entries || entries.length === 0) {
+  if (notes.length === 0) {
     const empty = document.createElement('div');
-    empty.className = 'guestbook-entry';
-    empty.textContent = 'No notes yet. You can be the first.';
+    empty.className = 'saved-note';
+    empty.textContent = 'No saved notes yet.';
     list.appendChild(empty);
     return;
   }
 
-  entries.forEach(entry => {
+  notes.slice(0, 5).forEach(note => {
     const item = document.createElement('div');
-    item.className = 'guestbook-entry';
+    item.className = 'saved-note';
 
-    const meta = document.createElement('div');
-    meta.className = 'guestbook-meta';
-
-    const name = document.createElement('span');
-    name.className = 'guestbook-name';
-    name.textContent = entry.name?.trim() || 'Anonymous';
-
-    const date = document.createElement('span');
-    date.textContent = formatGuestbookDate(entry.created_at);
+    const date = document.createElement('div');
+    date.className = 'saved-note-date';
+    date.textContent = formatNoteDate(note.createdAt);
 
     const message = document.createElement('div');
-    message.textContent = entry.message;
+    message.textContent = note.message;
 
-    meta.appendChild(name);
-    meta.appendChild(date);
-    item.appendChild(meta);
+    item.appendChild(date);
     item.appendChild(message);
     list.appendChild(item);
   });
 }
 
-async function loadGuestbook(){
-  const list = document.getElementById('guestbook-list');
-  if (!SUPABASE_READY || !supabaseClient) {
-    if (list) list.innerHTML = '<div class="guestbook-entry">Guestbook will appear after the shared storage is connected.</div>';
-    return;
-  }
+function savePracticeNote(){
+  const messageInput = document.getElementById('practice-note-message');
+  const status = document.getElementById('practice-note-status');
+  if (!messageInput || !status) return;
 
-  const {data, error} = await supabaseClient
-    .from('practice_guestbook')
-    .select('name,message,created_at')
-    .order('created_at', {ascending:false})
-    .limit(20);
-
-  if (error) {
-    if (list) list.innerHTML = '<div class="guestbook-entry">Guestbook is temporarily unavailable.</div>';
-    return;
-  }
-  renderGuestbook(data);
-}
-
-async function submitGuestbook(){
-  const nameInput = document.getElementById('guestbook-name');
-  const messageInput = document.getElementById('guestbook-message');
-  const submitBtn = document.getElementById('guestbook-submit');
-  const status = document.getElementById('guestbook-status');
-  if (!nameInput || !messageInput || !submitBtn || !status) return;
-
-  const name = nameInput.value.trim();
   const message = messageInput.value.trim();
-
   if (!message) {
     status.textContent = 'Write a short note first.';
     messageInput.focus();
     return;
   }
-  if (message.length > 280 || name.length > 60) return;
 
-  if (!SUPABASE_READY || !supabaseClient) {
-    status.textContent = 'The shared guestbook is not connected yet.';
-    return;
-  }
+  const notes = getPracticeNotes();
+  notes.unshift({message, createdAt:new Date().toISOString()});
+  localStorage.setItem('mgcr233PracticeNotes', JSON.stringify(notes.slice(0, 20)));
 
-  const lastPost = Number(localStorage.getItem('mgcr233GuestbookLastPost') || 0);
-  if (Date.now() - lastPost < 10000) {
-    status.textContent = 'Give it a few seconds before leaving another note.';
-    return;
-  }
-
-  submitBtn.disabled = true;
-  status.textContent = 'Posting...';
-
-  const {error} = await supabaseClient
-    .from('practice_guestbook')
-    .insert({name: name || null, message});
-
-  if (error) {
-    status.textContent = 'Could not post right now. Please try again.';
-  } else {
-    localStorage.setItem('mgcr233GuestbookLastPost', String(Date.now()));
-    messageInput.value = '';
-    status.textContent = 'Posted. Nice work today!';
-    await loadGuestbook();
-  }
-  submitBtn.disabled = false;
+  messageInput.value = '';
+  status.textContent = 'Saved on this browser. Nice work today!';
+  renderPracticeNotes();
 }
 
-function initGuestbook(){
-  const submitBtn = document.getElementById('guestbook-submit');
+function initPracticeNote(){
+  const saveBtn = document.getElementById('practice-note-save');
   const visitNote = document.getElementById('visit-note');
-  if (submitBtn) submitBtn.addEventListener('click', submitGuestbook);
+
+  if (saveBtn) saveBtn.addEventListener('click', savePracticeNote);
 
   if (visitNote) {
     const visits = Number(localStorage.getItem('mgcr233PracticeVisits') || 0) + 1;
@@ -2807,14 +2739,14 @@ function initGuestbook(){
     visitNote.textContent = `This is your ${ordinal(visits)} practice visit on this browser. Keep working!`;
   }
 
-  loadGuestbook();
+  renderPracticeNotes();
 }
 
 document.getElementById('back-btn').addEventListener('click', closeModule);
 renderModuleList();
 renderStudyTabs();
 renderStudyMaterials();
-initGuestbook();
+initPracticeNote();
 </script>
 </body>
 </html>
