@@ -2665,23 +2665,9 @@ function initPracticeMotivation(){
   }
 
   if (visitNote) {
-    const base = 'https://countapi.mileshilliard.com/api/v1';
-    const key = 'mgcr233-fall2026-practice-visits';
-    const counted = sessionStorage.getItem('mgcr233PracticeVisitCounted') === '1';
-    const endpoint = counted ? `${base}/get/${key}` : `${base}/hit/${key}`;
-    fetch(endpoint, {cache:'no-store'})
-      .then(res => {
-        if (!res.ok) throw new Error('counter unavailable');
-        return res.json();
-      })
-      .then(data => {
-        if (!counted) sessionStorage.setItem('mgcr233PracticeVisitCounted','1');
-        const value = Number(data.value);
-        if (Number.isFinite(value)) visitNote.textContent = `Practice visit #${value}. Keep going!`;
-      })
-      .catch(() => {
-        visitNote.textContent = 'Keep going. Every practice session counts.';
-      });
+    let visits = Number(localStorage.getItem('mgcr233PracticeVisits') || 0) + 1;
+    localStorage.setItem('mgcr233PracticeVisits', String(visits));
+    visitNote.textContent = `This is your ${visits}${visits === 1 ? 'st' : visits === 2 ? 'nd' : visits === 3 ? 'rd' : 'th'} practice visit on this browser. Keep working!`;
   }
 }
 
